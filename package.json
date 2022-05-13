@@ -1,0 +1,12 @@
+{
+  "name": "firefox-addon",
+  "version": "1.0.0",
+  "description": "GitHub action for publishing extension to Firefox Add-on",
+  "author": "hyperbola",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wdzeng/firefox-addon.git"
+  },
+  "license": "MIT"
+}
