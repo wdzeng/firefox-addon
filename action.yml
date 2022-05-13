@@ -1,16 +1,16 @@
-name: Firefox Addon
-description: Upload and publish addon to Firefox Addons
+name: Publish Firefox Add-on
+description: Upload and publish add-on to Firefox Addons
 author: Hyperbola
 
 inputs:
   guid:
-    description: Addon GUID.
+    description: Add-on GUID.
     required: true
   xpi-path:
-    description: Path to the addon .zip file.
+    description: Path to the add-on .zip file.
     required: true
   tester-only:
-    description: If true then the addon is published to listed users only. Default to false.
+    description: If true then the add-on is published to listed users only. Default to false.
     required: false
     default: "false"
   jwt-issuer:

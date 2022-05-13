@@ -58,14 +58,14 @@ async function updateAddon(addonGuid: string, uploadUuid: string, jwtToken: stri
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
 
-  core.info('Start to update addon.')
+  core.info('Start to update add-on.')
 
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
   const body = { upload: uploadUuid }
   const headers = { Authorization: `jwt ${jwtToken}` }
   await axios.post(url, body, { headers })
 
-  core.info('Addon updated.')
+  core.info('Add-on updated.')
 }
 
 async function uploadXpi(xpiPath: string, jwtToken: string, testerOnly): Promise<string> {
@@ -105,7 +105,7 @@ async function uploadXpi(xpiPath: string, jwtToken: string, testerOnly): Promise
 }
 
 async function run(addonGuid: string, xpiPath: string, testerOnly: boolean, jwtIssuer: string, jwtSecret: string) {
-  core.info('Start to publish addon.')
+  core.info('Start to publish add-on.')
 
   // Create jwt token
   const jwtToken = generateJwtToken(jwtIssuer, jwtSecret)
@@ -113,14 +113,14 @@ async function run(addonGuid: string, xpiPath: string, testerOnly: boolean, jwtI
   // Upload xpi
   const uuid = await uploadXpi(xpiPath, jwtToken, testerOnly)
 
-  // Update existing addon
+  // Update existing add-on
   await updateAddon(addonGuid, uuid, jwtToken)
 
-  core.info('Addon published.')
+  core.info('Add-on published.')
 }
 
 async function main() {
-  const addonGuid = core.getInput('addon-guid', { required: true })
+  const addonGuid = core.getInput('add-on-guid', { required: true })
   const xpiPath = core.getInput('xpi-path', { required: true })
   const testerOnly = core.getBooleanInput('tester-only')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })

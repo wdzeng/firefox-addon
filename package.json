@@ -1,14 +1,14 @@
 {
   "name": "firefox-addon",
   "private": true,
-  "description": "Upload firefox addon to Firefox Addons",
+  "description": "Upload firefox add-on to Firefox Addons",
   "scripts": {
     "build": "tsc && ncc build dist/index.js && cp action.yml dist",
     "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wdzeng/firefox-addon-action.git"
+    "url": "git+https://github.com/wdzeng/firefox-addon.git"
   },
   "author": "Hyperbola",
   "dependencies": {

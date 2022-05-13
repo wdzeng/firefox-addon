@@ -1,12 +1,12 @@
 # Firefox Addon
 
-This action publishes your firefox addon to [Firefox Addons](https://addons.mozilla.org/). This action uses the [addons.mozilla.org v5 API](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
+This action publishes your firefox add-on to [Firefox Addons](https://addons.mozilla.org/). This action uses the [addons.mozilla.org v5 API](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
 
-This action can only publish new version of an existing addon rather than creating and publishing a new one.
+This action can only publish new version of an existing add-on rather than creating and publishing a new one.
 
 ## Prepare
 
-Followings items are required before publishing an addon:
+Followings items are required before publishing an add-on:
 
 - An xpi (zip) file to be uploaded.
 - A JWT issuer and secret.
@@ -17,13 +17,13 @@ If you have no JWT issuer and secret, go [here](https://addons.mozilla.org/en-US
 
 Unless otherwise noted with default value, all options are required.
 
-- `addon-guid`: addon guid.
-- `xpi-path`: path to the xpi (or zip) file of your addon generated in the previous workflow steps.
+- `addon-guid`: add-on guid.
+- `xpi-path`: path to the xpi (or zip) file of your add-on generated in the previous workflow steps.
 - `tester-only` (boolean) `true` indicates publishing to listed users only; default `false`.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
-The addon guid should be the value at `browser_specific_settings.gecko.id` in manifest.json. It may be an email.
+The add-on guid should be the value at `browser_specific_settings.gecko.id` in manifest.json. It may be an email.
 
 ```yaml
 steps:
