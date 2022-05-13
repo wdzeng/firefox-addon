@@ -3,7 +3,7 @@
   "private": true,
   "description": "Upload firefox addon to Firefox Addons",
   "scripts": {
-    "build": "tsc && ncc build dist/index.js && cp src/action.yml dist",
+    "build": "tsc && ncc build dist/index.js && cp action.yml dist",
     "clean": "rm -rf dist"
   },
   "repository": {
