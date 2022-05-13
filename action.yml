@@ -25,5 +25,5 @@ runs:
   main: "index.js"
 
 branding:
-  icon: aperture
+  icon: globe
   color: blue
