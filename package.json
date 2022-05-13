@@ -1,5 +1,5 @@
 {
-  "name": "firefox-addon-action",
+  "name": "firefox-addon",
   "private": true,
   "description": "Upload firefox addon to Firefox Addons",
   "scripts": {

@@ -1,4 +1,4 @@
-# Firefox Addons Action
+# Firefox Addon
 
 This action publishes your firefox addon to [Firefox Addons](https://addons.mozilla.org/). This action uses the [addons.mozilla.org v5 API](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
 
@@ -27,7 +27,7 @@ The addon guid should be the value at `browser_specific_settings.gecko.id` in ma
 
 ```yaml
 steps:
-  - uses: wdzeng/firefox-addons-action@v1
+  - uses: wdzeng/firefox-addon@v1
     with:
       guid: your-addon-guid
       xpi-path: your-addon.zip
