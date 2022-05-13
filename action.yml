@@ -23,3 +23,7 @@ inputs:
 runs:
   using: node16
   main: "index.js"
+
+branding:
+  icon: aperture
+  color: blue
