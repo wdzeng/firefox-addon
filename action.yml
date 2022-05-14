@@ -7,7 +7,7 @@ inputs:
     description: Add-on GUID.
     required: true
   xpi-path:
-    description: Path to the add-on .zip file.
+    description: Path to the add-on zip file.
     required: true
   self-hosted:
     description: Whether the add-on should be self-hosted. Default false.
