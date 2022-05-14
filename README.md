@@ -1,6 +1,6 @@
 # Firefox Addon
 
-This action publishes your firefox add-on to [Firefox Addons](https://addons.mozilla.org/) using the [addons.mozilla.org v5 API](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
+This action publishes your Firefox add-on to [Firefox Addons](https://addons.mozilla.org/) using the [addons.mozilla.org API v5](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
 
 This action can only publish new version of an existing add-on. Publishing a new add-on is not supported.
 
