@@ -47,7 +47,7 @@ async function requireFileExists(path: string) {
       core.setFailed('Not a regular file: ' + path)
       process.exit(1)
     }
-    core.info('OK xpi file exists: ' + path)
+    core.debug('OK xpi file exists: ' + path)
   } catch (e: unknown) {
     core.setFailed('File not found: ' + path)
     process.exit(1)
@@ -68,7 +68,7 @@ async function updateAddon(addonGuid: string, uploadUuid: string, jwtToken: stri
   core.info('Add-on updated.')
 }
 
-async function uploadXpi(xpiPath: string, jwtToken: string, testerOnly): Promise<string> {
+async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean): Promise<string> {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
 
   // send upload create
@@ -79,7 +79,7 @@ async function uploadXpi(xpiPath: string, jwtToken: string, testerOnly): Promise
   let url = 'https://addons.mozilla.org/api/v5/addons/upload/'
   const formData = new FormData()
   formData.append('upload', createReadStream(xpiPath))
-  formData.append('channel', testerOnly ? 'listed' : 'unlisted')
+  formData.append('channel', selfHosted ? 'unlisted' : 'listed')
   let headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
   let response = await axios.post(url, formData, { headers })
 
@@ -104,14 +104,14 @@ async function uploadXpi(xpiPath: string, jwtToken: string, testerOnly): Promise
   return uuid
 }
 
-async function run(addonGuid: string, xpiPath: string, testerOnly: boolean, jwtIssuer: string, jwtSecret: string) {
+async function run(addonGuid: string, xpiPath: string, selfHosted: boolean, jwtIssuer: string, jwtSecret: string) {
   core.info('Start to publish add-on.')
 
   // Create jwt token
   const jwtToken = generateJwtToken(jwtIssuer, jwtSecret)
 
   // Upload xpi
-  const uuid = await uploadXpi(xpiPath, jwtToken, testerOnly)
+  const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
 
   // Update existing add-on
   await updateAddon(addonGuid, uuid, jwtToken)
@@ -122,12 +122,12 @@ async function run(addonGuid: string, xpiPath: string, testerOnly: boolean, jwtI
 async function main() {
   const addonGuid = core.getInput('add-on-guid', { required: true })
   const xpiPath = core.getInput('xpi-path', { required: true })
-  const testerOnly = core.getBooleanInput('tester-only')
+  const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
 
   try {
-    await run(addonGuid, xpiPath, testerOnly, jwtIssuer, jwtSecret)
+    await run(addonGuid, xpiPath, selfHosted, jwtIssuer, jwtSecret)
   } catch (e: unknown) {
     handleError(e)
   }

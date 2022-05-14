@@ -9,8 +9,8 @@ inputs:
   xpi-path:
     description: Path to the add-on .zip file.
     required: true
-  tester-only:
-    description: If true then the add-on is published to listed users only. Default to false.
+  self-hosted:
+    description: Whether the add-on should be self-hosted. Default false.
     required: false
     default: "false"
   jwt-issuer:

@@ -19,7 +19,7 @@ Unless otherwise noted with default value, all options are required.
 
 - `addon-guid`: add-on guid.
 - `xpi-path`: path to the xpi (or zip) file of your add-on generated in the previous workflow steps.
-- `tester-only` (boolean) `true` indicates publishing to listed users only; default `false`.
+- `self-hosted` (boolean) whether the add-on should be self-hosted; default `false`.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
