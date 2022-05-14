@@ -31,7 +31,7 @@ steps:
     with:
       guid: your-addon-guid
       xpi-path: your-addon.zip
-      tester-only: false
+      self-hosted: false
       jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
       jwt-secret: ${{ secrets.FIREFOX_JWT_SECRET }}
 ```
