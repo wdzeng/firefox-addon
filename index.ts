@@ -5,6 +5,8 @@ import FormData from 'form-data'
 import axios, { AxiosError } from 'axios'
 
 function handleError(error: unknown) {
+  core.debug(JSON.stringify(error))
+
   // HTTP error
   if (error instanceof AxiosError) {
     if (error.response) {
@@ -35,9 +37,10 @@ function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
     iat: issuedAt,
     exp: issuedAt + 60
   }
-  const ret = jwt.sign(payload, jwtSecret, { algorithm: 'HS256' })
+  const jwtToken = jwt.sign(payload, jwtSecret, { algorithm: 'HS256' })
   core.info('JWT token generated.')
-  return ret
+  core.debug('JWT token: ' + jwtToken)
+  return jwtToken
 }
 
 async function requireFileExists(path: string) {
@@ -47,7 +50,7 @@ async function requireFileExists(path: string) {
       core.setFailed('Not a regular file: ' + path)
       process.exit(1)
     }
-    core.debug('OK xpi file exists: ' + path)
+    core.debug('The xpi file exists and is a regular file.')
   } catch (e: unknown) {
     core.setFailed('File not found: ' + path)
     process.exit(1)
@@ -125,6 +128,12 @@ async function main() {
   const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
+
+  core.debug('Addon GUID: ' + addonGuid)
+  core.debug('Xpi file path: ' + xpiPath)
+  core.debug('Self hosted: ' + selfHosted)
+  core.debug('JWT issuer: ' + jwtIssuer)
+  core.debug('JWT secret: ' + jwtSecret)
 
   try {
     await run(addonGuid, xpiPath, selfHosted, jwtIssuer, jwtSecret)
