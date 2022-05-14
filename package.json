@@ -1,7 +1,7 @@
 {
   "name": "firefox-addon",
   "private": true,
-  "description": "Upload firefox add-on to Firefox Addons",
+  "description": "publish add-on to Firefox Addons.",
   "scripts": {
     "build": "tsc && ncc build dist/index.js && cp action.yml dist",
     "clean": "rm -rf dist"
