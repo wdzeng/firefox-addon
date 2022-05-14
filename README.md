@@ -1,5 +1,9 @@
 # Firefox Addon
 
+![version](https://img.shields.io/github/v/release/wdzeng/firefox-addon)
+![workflow](https://img.shields.io/github/workflow/status/wdzeng/firefox-addon/Build?label=ci&logo=github)
+![license](https://img.shields.io/github/license/wdzeng/firefox-addon?color=red)
+
 This action publishes your Firefox add-on to [Firefox Addons](https://addons.mozilla.org/) using the [addons.mozilla.org API v5](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
 
 This action can only publish new version of an existing add-on. Publishing a new add-on is not supported.
