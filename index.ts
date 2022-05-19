@@ -12,7 +12,6 @@ function handleError(error: unknown) {
     if (error.response) {
       // Got response from Firefox API server with status code 4XX or 5XX
       core.setFailed('Firefox API server responses with error code: ' + error.response.status)
-      core.setFailed(JSON.stringify(error.response.headers))
       core.setFailed(error.response.data)
     }
     core.setFailed(error.message)
@@ -57,14 +56,14 @@ async function requireFileExists(path: string) {
   }
 }
 
-async function updateAddon(addonGuid: string, uploadUuid: string, jwtToken: string) {
+async function updateAddon(addonGuid: string, license: undefined | string, uploadUuid: string, jwtToken: string) {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
 
   core.info('Start to update add-on.')
 
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
-  const body = { upload: uploadUuid }
+  const body = { upload: uploadUuid, license }
   const headers = { Authorization: `jwt ${jwtToken}` }
   await axios.post(url, body, { headers })
 
@@ -107,7 +106,7 @@ async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean)
   return uuid
 }
 
-async function run(addonGuid: string, xpiPath: string, selfHosted: boolean, jwtIssuer: string, jwtSecret: string) {
+async function run(addonGuid: string, license: string | undefined, xpiPath: string, selfHosted: boolean, jwtIssuer: string, jwtSecret: string) {
   core.info('Start to publish add-on.')
 
   // Create jwt token
@@ -117,7 +116,7 @@ async function run(addonGuid: string, xpiPath: string, selfHosted: boolean, jwtI
   const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
 
   // Update existing add-on
-  await updateAddon(addonGuid, uuid, jwtToken)
+  await updateAddon(addonGuid, license, uuid, jwtToken)
 
   core.info('Add-on published.')
 }
@@ -125,18 +124,20 @@ async function run(addonGuid: string, xpiPath: string, selfHosted: boolean, jwtI
 async function main() {
   const addonGuid = core.getInput('addon-guid', { required: true })
   const xpiPath = core.getInput('xpi-path', { required: true })
+  const license = core.getInput('license', { required: false }) || undefined
   const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
 
   core.debug('Addon GUID: ' + addonGuid)
   core.debug('Xpi file path: ' + xpiPath)
+  core.debug('License: ' + license)
   core.debug('Self hosted: ' + selfHosted)
   core.debug('JWT issuer: ' + jwtIssuer)
   core.debug('JWT secret: ' + jwtSecret)
 
   try {
-    await run(addonGuid, xpiPath, selfHosted, jwtIssuer, jwtSecret)
+    await run(addonGuid, license, xpiPath, selfHosted, jwtIssuer, jwtSecret)
   } catch (e: unknown) {
     handleError(e)
   }

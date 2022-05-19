@@ -19,11 +19,12 @@ If you have no JWT issuer and secret, go [here](https://addons.mozilla.org/en-US
 
 ## Usage
 
-Unless otherwise noted with default value, all options are required.
+All options are required unless otherwise noted.
 
 - `addon-guid`: add-on's GUID.
 - `xpi-path`: path to the xpi (or zip) file of your add-on generated in the previous workflow steps.
-- `self-hosted` (boolean) whether the add-on should be self-hosted; default `false`.
+- `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
+- `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
