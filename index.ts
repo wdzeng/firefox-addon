@@ -123,7 +123,7 @@ async function run(addonGuid: string, xpiPath: string, selfHosted: boolean, jwtI
 }
 
 async function main() {
-  const addonGuid = core.getInput('add-on-guid', { required: true })
+  const addonGuid = core.getInput('addon-guid', { required: true })
   const xpiPath = core.getInput('xpi-path', { required: true })
   const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })

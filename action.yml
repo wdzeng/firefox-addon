@@ -3,8 +3,8 @@ description: Upload and publish add-on to Firefox Addons
 author: Hyperbola
 
 inputs:
-  guid:
-    description: Add-on GUID.
+  addon-guid:
+    description: Add-on's GUID.
     required: true
   xpi-path:
     description: Path to the add-on zip file.

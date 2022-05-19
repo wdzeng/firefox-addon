@@ -21,19 +21,19 @@ If you have no JWT issuer and secret, go [here](https://addons.mozilla.org/en-US
 
 Unless otherwise noted with default value, all options are required.
 
-- `addon-guid`: add-on guid.
+- `addon-guid`: add-on's GUID.
 - `xpi-path`: path to the xpi (or zip) file of your add-on generated in the previous workflow steps.
 - `self-hosted` (boolean) whether the add-on should be self-hosted; default `false`.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
-The add-on guid should be the value at `browser_specific_settings.gecko.id` in manifest.json. It may be an email.
+The add-on's GUID should be the value at `browser_specific_settings.gecko.id` in manifest.json. It may be an email.
 
 ```yaml
 steps:
   - uses: wdzeng/firefox-addon@v1
     with:
-      guid: your-addon-guid
+      addon-guid: your-addon's-guid
       xpi-path: your-addon.zip
       self-hosted: false
       jwt-issuer: ${{ secrets.FIREFOX_JWT_ISSUER }}
