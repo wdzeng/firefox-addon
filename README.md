@@ -46,3 +46,9 @@ steps:
 - [External API](https://addons-server.readthedocs.io/en/latest/topics/api/index.html)
 - [Add-ons](https://addons-server.readthedocs.io/en/latest/topics/api/addons.html)
 - [Authentication (External)](https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#create-a-jwt-for-each-request)
+
+## Sister Actions
+
+- [Edge Add-on Action](https://github.com/wdzeng/edge-addon)
+- [Chrome Extension Action](https://github.com/wdzeng/chrome-extension)
+
