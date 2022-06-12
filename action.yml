@@ -1,0 +1,29 @@
+name: Publish Firefox Add-on
+description: GitHub action for publishing extension to Firefox Add-on
+author: Hyperbola
+
+inputs:
+  addon-guid:
+    description: Add-on's GUID.
+    required: true
+  xpi-path:
+    description: Path to the add-on zip file.
+    required: true
+  self-hosted:
+    description: Whether the add-on should be self-hosted. Default false.
+    required: false
+    default: "false"
+  jwt-issuer:
+    description: Firefox Addons JWT issuer.
+    required: true
+  jwt-secret:
+    description: Firefox Addons JWT secret.
+    required: true
+
+runs:
+  using: node16
+  main: "index.js"
+
+branding:
+  icon: globe
+  color: blue
