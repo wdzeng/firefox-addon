@@ -1,8 +1,8 @@
 {
   "name": "firefox-addon",
-  "version": "v1.0.0"
-  "description": "publish add-on to Firefox Addons.",
-  "author": "Hyperbola"
+  "version": "v1.0.0",
+  "description": "publish to Firefox Add-ons.",
+  "author": "Hyperbola",
   "private": true,
   "repository": {
     "type": "git",
