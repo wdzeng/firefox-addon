@@ -1,16 +1,17 @@
 {
   "name": "firefox-addon",
-  "private": true,
+  "version": "v1.0.0"
   "description": "publish add-on to Firefox Addons.",
-  "scripts": {
-    "build": "tsc && ncc build dist/index.js && cp action.yml dist",
-    "clean": "rm -rf dist"
-  },
+  "author": "Hyperbola"
+  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/wdzeng/firefox-addon.git"
   },
-  "author": "Hyperbola",
+  "scripts": {
+    "build": "tsc && ncc build dist/index.js && cp action.yml dist",
+    "clean": "rm -rf dist"
+  },
   "dependencies": {
     "@actions/core": "^1.8.0",
     "axios": "^0.27.2",
