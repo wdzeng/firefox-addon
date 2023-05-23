@@ -1,7 +1,6 @@
 # Firefox Addon
 
 [![version](https://img.shields.io/github/v/release/wdzeng/firefox-addon)](https://github.com/wdzeng/firefox-addon/releases/latest)
-[![workflow](https://img.shields.io/github/workflow/status/wdzeng/firefox-addon/Build?label=ci&logo=github)](https://github.com/wdzeng/firefox-addon/actions)
 [![license](https://img.shields.io/github/license/wdzeng/firefox-addon?color=red)](https://github.com/wdzeng/firefox-addon/blob/main/LICENSE)
 
 This action publishes your Firefox add-on to [Firefox Addons](https://addons.mozilla.org/) using the [addons.mozilla.org API v5](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
