@@ -102,6 +102,10 @@ async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean)
     processed = response.data.processed
   }
 
+  if (!response.data.valid) {
+    throw new Error(`xpi processed, but not valid:\n${JSON.stringify(response.data.validation, null, 2)}`)
+  }
+
   core.info('xpi processed.')
   return uuid
 }
