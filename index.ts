@@ -88,18 +88,18 @@ async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean)
   core.info('xpi file uploaded.')
 
   const uuid: string = response.data.uuid
-  let valid: boolean = response.data.valid
+  let processed: boolean = response.data.processed
 
   // Wait for upload completed
   url = `https://addons.mozilla.org/api/v5/addons/upload/${uuid}/`
   headers = { Authorization: `jwt ${jwtToken}` }
-  while (!valid) {
+  while (!processed) {
     core.info('xpi not yet processed. Wait 5s.')
     await new Promise(res => setTimeout(res, 5000))
 
     core.info('Checking if xpi is processed.')
     response = await axios(url, { headers })
-    valid = response.data.valid
+    processed = response.data.processed
   }
 
   core.info('xpi processed.')
