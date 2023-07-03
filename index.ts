@@ -34,7 +34,7 @@ function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
     iss: jwtIssuer,
     jti: Math.random().toString(),
     iat: issuedAt,
-    exp: issuedAt + 60
+    exp: issuedAt + 5 * 60
   }
   const jwtToken = jwt.sign(payload, jwtSecret, { algorithm: 'HS256' })
   core.info('JWT token generated.')
