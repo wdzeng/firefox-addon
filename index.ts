@@ -1,17 +1,20 @@
-import { createReadStream, promises as fs } from 'fs'
+import { createReadStream } from 'node:fs'
+import fs from 'node:fs/promises'
+
 import * as core from '@actions/core'
-import jwt from 'jsonwebtoken'
+import axios from 'axios'
 import FormData from 'form-data'
-import axios, { AxiosError } from 'axios'
+import jwt from 'jsonwebtoken'
 
 function handleError(error: unknown) {
   core.debug(JSON.stringify(error))
 
   // HTTP error
-  if (error instanceof AxiosError) {
+  if (error instanceof axios.AxiosError) {
     if (error.response) {
       // Got response from Firefox API server with status code 4XX or 5XX
-      core.setFailed('Firefox API server responses with error code: ' + error.response.status)
+      const errCode = error.response.status
+      core.setFailed(`Firefox API server responses with error code: ${errCode}`)
       core.setFailed(error.response.data)
     }
     core.setFailed(error.message)
@@ -38,7 +41,7 @@ function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   }
   const jwtToken = jwt.sign(payload, jwtSecret, { algorithm: 'HS256' })
   core.info('JWT token generated.')
-  core.debug('JWT token: ' + jwtToken)
+  core.debug(`JWT token: ${jwtToken}`)
   return jwtToken
 }
 
@@ -46,17 +49,22 @@ async function requireFileExists(path: string) {
   try {
     const s = await fs.stat(path)
     if (!s.isFile) {
-      core.setFailed('Not a regular file: ' + path)
+      core.setFailed(`Not a regular file: ${path}`)
       process.exit(1)
     }
     core.debug('The xpi file exists and is a regular file.')
   } catch (e: unknown) {
-    core.setFailed('File not found: ' + path)
+    core.setFailed(`File not found: ${path}`)
     process.exit(1)
   }
 }
 
-async function updateAddon(addonGuid: string, license: undefined | string, uploadUuid: string, jwtToken: string) {
+async function updateAddon(
+  addonGuid: string,
+  license: undefined | string,
+  uploadUuid: string,
+  jwtToken: string
+) {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
 
@@ -70,7 +78,11 @@ async function updateAddon(addonGuid: string, license: undefined | string, uploa
   core.info('Add-on updated.')
 }
 
-async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean): Promise<string> {
+async function uploadXpi(
+  xpiPath: string,
+  jwtToken: string,
+  selfHosted: boolean
+): Promise<string> {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
 
   // send upload create
@@ -112,7 +124,14 @@ async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean)
   return uuid
 }
 
-async function run(addonGuid: string, license: string | undefined, xpiPath: string, selfHosted: boolean, jwtIssuer: string, jwtSecret: string) {
+async function run(
+  addonGuid: string,
+  license: string | undefined,
+  xpiPath: string,
+  selfHosted: boolean,
+  jwtIssuer: string,
+  jwtSecret: string
+) {
   core.info('Start to publish add-on.')
 
   // Create jwt token
