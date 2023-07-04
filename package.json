@@ -1,6 +1,6 @@
 {
   "name": "firefox-addon",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "GitHub action for publishing extension to Firefox Add-on",
   "author": "hyperbola",
   "private": true,
