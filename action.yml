@@ -1,6 +1,6 @@
 name: Publish Firefox Add-on
 description: GitHub action for publishing extension to Firefox Add-on
-author: Hyperbola
+author: hyperbola
 
 inputs:
   addon-guid:
