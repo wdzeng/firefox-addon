@@ -118,6 +118,7 @@ async function uploadXpi(
     // Field `validation` is an object. Convert it to string for better display.
     const validationMsg = JSON.stringify(response.data.validation, null, 2)
     core.setFailed(`xpi processed, but not valid:\n${validationMsg}`)
+    process.exit(2)
   }
 
   core.info('xpi processed.')
