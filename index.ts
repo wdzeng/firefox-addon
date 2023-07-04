@@ -135,13 +135,6 @@ async function main() {
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
 
-  core.debug('Addon GUID: ' + addonGuid)
-  core.debug('Xpi file path: ' + xpiPath)
-  core.debug('License: ' + license)
-  core.debug('Self hosted: ' + selfHosted)
-  core.debug('JWT issuer: ' + jwtIssuer)
-  core.debug('JWT secret: ' + jwtSecret)
-
   try {
     await run(addonGuid, license, xpiPath, selfHosted, jwtIssuer, jwtSecret)
   } catch (e: unknown) {
