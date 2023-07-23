@@ -1,21 +1,47 @@
+#!/usr/bin/env node
+
 import { createReadStream } from 'node:fs'
 import fs from 'node:fs/promises'
 
 import * as core from '@actions/core'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import FormData from 'form-data'
 import jwt from 'jsonwebtoken'
+
+// https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#get--api-v5-addons-upload--string-uuid--
+interface UploadResponse {
+  // The upload id.
+  uuid: string
+  // The version channel, which determines its visibility on the site. Can be either unlisted or listed.
+  channel: 'listed' | 'unlisted'
+  // If the version has been processed by the validator.
+  processed: boolean
+  // If this upload has been submitted as a new add-on or version already. An upload can only be submitted once.
+  submitted: boolean
+  // URL to check the status of this upload.
+  url: string
+  // If the version passed validation.
+  valid: boolean
+  // The validation results JSON blob.
+  validation: object
+  // The version number parsed from the manifest.
+  version: string
+}
 
 function handleError(error: unknown) {
   core.debug(JSON.stringify(error))
 
   // HTTP error
-  if (error instanceof axios.AxiosError) {
+  if (error instanceof AxiosError) {
     if (error.response) {
       // Got response from Firefox API server with status code 4XX or 5XX
       const errCode = error.response.status
       core.setFailed(`Firefox API server responses with error code: ${errCode}`)
-      core.setFailed(error.response.data)
+      if (typeof error.response.data === 'string') {
+        core.setFailed(error.response.data)
+      } else {
+        core.setFailed(JSON.stringify(error.response.data))
+      }
     }
     core.setFailed(error.message)
     return
@@ -34,10 +60,11 @@ function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   core.info('Start to generate JWT token.')
   const issuedAt = Math.floor(Date.now() / 1000)
   const payload = {
-    iss: jwtIssuer,
-    jti: Math.random().toString(),
+    // Set expiration time to 5 minutes.
+    exp: issuedAt + 5 * 60,
     iat: issuedAt,
-    exp: issuedAt + 5 * 60  // set expiration time to 5 minutes
+    iss: jwtIssuer,
+    jti: Math.random().toString()
   }
   const jwtToken = jwt.sign(payload, jwtSecret, { algorithm: 'HS256' })
   core.info('JWT token generated.')
@@ -53,7 +80,7 @@ async function requireFileExists(path: string) {
       process.exit(1)
     }
     core.debug('The xpi file exists and is a regular file.')
-  } catch (e: unknown) {
+  } catch {
     core.setFailed(`File not found: ${path}`)
     process.exit(1)
   }
@@ -67,22 +94,15 @@ async function updateAddon(
 ) {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
-
   core.info('Start to update add-on.')
-
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
   const body = { upload: uploadUuid, license }
   const headers = { Authorization: `jwt ${jwtToken}` }
   await axios.post(url, body, { headers })
-
   core.info('Add-on updated.')
 }
 
-async function uploadXpi(
-  xpiPath: string,
-  jwtToken: string,
-  selfHosted: boolean
-): Promise<string> {
+async function uploadXpi(xpiPath: string, jwtToken: string, selfHosted: boolean): Promise<string> {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
 
   // send upload create
@@ -95,7 +115,7 @@ async function uploadXpi(
   formData.append('upload', createReadStream(xpiPath))
   formData.append('channel', selfHosted ? 'unlisted' : 'listed')
   let headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
-  let response = await axios.post(url, formData, { headers })
+  let response = await axios.post<UploadResponse>(url, formData, { headers })
 
   core.info('xpi file uploaded.')
 
@@ -116,6 +136,7 @@ async function uploadXpi(
 
   if (!response.data.valid) {
     // Field `validation` is an object. Convert it to string for better display.
+    // eslint-disable-next-line unicorn/no-null
     const validationMsg = JSON.stringify(response.data.validation, null, 2)
     core.setFailed(`xpi processed, but not valid:\n${validationMsg}`)
     process.exit(2)
@@ -162,4 +183,4 @@ async function main() {
   }
 }
 
-main()
+await main()
