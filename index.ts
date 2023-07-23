@@ -48,7 +48,7 @@ function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
 async function requireFileExists(path: string) {
   try {
     const s = await fs.stat(path)
-    if (!s.isFile) {
+    if (!s.isFile()) {
       core.setFailed(`Not a regular file: ${path}`)
       process.exit(1)
     }
