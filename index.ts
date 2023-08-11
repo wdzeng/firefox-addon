@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { createReadStream } from 'node:fs'
 import fs from 'node:fs/promises'
 
@@ -183,4 +181,5 @@ async function main() {
   }
 }
 
-await main()
+// Cannot use top-level await in .cjs file.
+void main()

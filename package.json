@@ -23,7 +23,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^16.18.38",
     "@vercel/ncc": "^0.36.1",
-    "eslint-config-wdzeng": "github:wdzeng/eslint-config#semver:^0.3.4",
+    "eslint-config-wdzeng": "github:wdzeng/eslint-config#semver:^0.4.2",
     "typescript": "^5.1.6"
   },
   "packageManager": "pnpm@8.6.9",

@@ -1,4 +1,3 @@
-/* eslint-env node */
 module.exports = {
   root: true,
   extends: ['wdzeng/typescript'],
@@ -13,7 +12,8 @@ module.exports = {
     project: './tsconfig.json'
   },
   rules: {
-    // Your custom rules go here ...
+    'unicorn/no-process-exit': 'off',
+    'unicorn/prefer-top-level-await': 'off',
     'prettier/prettier': 'warn'
   },
 }
