@@ -8,6 +8,8 @@
     "type": "git",
     "url": "git+https://github.com/wdzeng/firefox-addon.git"
   },
+  "packageManager": "pnpm@8.7.6",
+  "license": "MIT",
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
     "transpile": "esbuild index.ts --platform=node --minify --target=node16 --bundle --outfile=dist/index.cjs",
@@ -15,18 +17,30 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@actions/core": "^1.10.0",
-    "axios": "^1.4.0",
+    "@actions/core": "^1.10.1",
+    "axios": "^1.5.0",
     "form-data": "^4.0.0",
-    "jsonwebtoken": "^9.0.1"
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.2",
-    "@types/node": "^16.18.38",
-    "esbuild": "^0.19.0",
-    "eslint-config-wdzeng": "github:wdzeng/eslint-config#semver:^0.4.2",
-    "typescript": "^5.1.6"
+    "@types/jsonwebtoken": "^9.0.3",
+    "@types/node": "^20.6.3",
+    "esbuild": "^0.19.3",
+    "eslint": "^8.50.0",
+    "eslint-config-wdzeng": "github:wdzeng/eslint-config#semver:^0.4.4",
+    "prettier": "^3.0.3",
+    "typescript": "^5.2.2"
   },
-  "packageManager": "pnpm@8.6.9",
-  "license": "MIT"
+  "pnpm": {
+    "overrides": {
+      "array-includes": "npm:@nolyfill/array-includes@latest",
+      "array.prototype.findlastindex": "npm:@nolyfill/array.prototype.findlastindex@latest",
+      "array.prototype.flat": "npm:@nolyfill/array.prototype.flat@latest",
+      "array.prototype.flatmap": "npm:@nolyfill/array.prototype.flatmap@latest",
+      "has": "npm:@nolyfill/has@latest",
+      "object.fromentries": "npm:@nolyfill/object.fromentries@latest",
+      "object.groupby": "npm:@nolyfill/object.groupby@latest",
+      "object.values": "npm:@nolyfill/object.values@latest"
+    }
+  }
 }
