@@ -12,8 +12,8 @@
   "license": "MIT",
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
-    "transpile": "esbuild index.ts --platform=node --minify --target=node16 --bundle --outfile=dist/index.cjs",
-    "lint": "eslint index.ts --fix",
+    "transpile": "esbuild src/index.ts --platform=node --target=node16 --minify --bundle --outfile=dist/index.cjs",
+    "lint": "eslint src --fix",
     "clean": "rm -rf dist"
   },
   "dependencies": {
