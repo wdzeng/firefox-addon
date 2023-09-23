@@ -12,9 +12,9 @@
   "license": "MIT",
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
-    "transpile": "esbuild src/index.ts --platform=node --target=node16 --minify --bundle --outfile=dist/index.cjs",
+    "transpile": "esbuild src/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/index.cjs",
     "test": "pnpm clean && pnpm transpile:test && node -r dotenv/config dist/test/index.cjs dotenv_config_path=test/.env.local",
-    "transpile:test": "esbuild test/index.ts --platform=node --target=node16 --minify --bundle --outfile=dist/test/index.cjs",
+    "transpile:test": "esbuild test/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/test/index.cjs",
     "lint": "eslint src --fix",
     "clean": "rm -rf dist"
   },
