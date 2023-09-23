@@ -21,8 +21,8 @@ inputs:
     required: true
 
 runs:
-  using: node16
-  main: "index.js"
+  using: node20
+  main: "index.cjs"
 
 branding:
   icon: globe
