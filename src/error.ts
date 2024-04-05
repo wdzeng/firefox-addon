@@ -6,6 +6,7 @@ import { stringify } from '@/utils'
 export const ERR_XPI_FILE = 1
 export const ERR_XPI_VALIDATION_FAILED = 2
 export const ERR_XPI_VALIDATION_TIMEOUT = 4
+export const ERR_INVALID_INPUT = 5
 export const ERR_UNKNOWN_HTTP = 254
 export const ERR_UNKNOWN = 255
 
