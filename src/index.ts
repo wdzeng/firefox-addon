@@ -1,6 +1,8 @@
+import fs from 'node:fs'
+
 import * as core from '@actions/core'
 
-import { handleError } from '@/error'
+import { ERR_XPI_FILE, handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
 
 function isStringToStringMapping(a: unknown): a is Record<string, string> {
@@ -13,6 +15,20 @@ function isStringToStringMapping(a: unknown): a is Record<string, string> {
     }
   }
   return true
+}
+
+function requireXpiFileExists(path: string): void {
+  try {
+    const s = fs.statSync(path)
+    if (!s.isFile()) {
+      core.setFailed(`Not a regular file: ${path}`)
+      process.exit(ERR_XPI_FILE)
+    }
+    core.debug('The xpi file exists and is a regular file.')
+  } catch {
+    core.setFailed(`File not found: ${path}`)
+    process.exit(ERR_XPI_FILE)
+  }
 }
 
 function isValidXpiExtensionName(xpiPath: string) {
@@ -45,6 +61,7 @@ async function main() {
     core.debug(`xpi-path: ${xpiPath}`)
     return
   }
+  requireXpiFileExists(xpiPath)
 
   const license = core.getInput('license', { required: false }) || undefined
   let releaseNotes: Record<string, string> | undefined = undefined

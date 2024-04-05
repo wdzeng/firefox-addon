@@ -1,5 +1,3 @@
-import fs from 'node:fs/promises'
-
 import * as core from '@actions/core'
 import { AxiosError } from 'axios'
 
@@ -37,18 +35,4 @@ export function handleError(error: unknown): never {
     core.setFailed('Unknown error occurred.')
   }
   process.exit(ERR_UNKNOWN)
-}
-
-export async function requireXpiFileExists(path: string): Promise<void> {
-  try {
-    const s = await fs.stat(path)
-    if (!s.isFile()) {
-      core.setFailed(`Not a regular file: ${path}`)
-      process.exit(ERR_XPI_FILE)
-    }
-    core.debug('The xpi file exists and is a regular file.')
-  } catch {
-    core.setFailed(`File not found: ${path}`)
-    process.exit(ERR_XPI_FILE)
-  }
 }

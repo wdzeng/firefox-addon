@@ -6,11 +6,7 @@ import FormData from 'form-data'
 import jwt from 'jsonwebtoken'
 
 import type { UploadResponse } from '@/api-types'
-import {
-  ERR_XPI_VALIDATION_FAILED,
-  ERR_XPI_VALIDATION_TIMEOUT,
-  requireXpiFileExists
-} from '@/error'
+import { ERR_XPI_VALIDATION_FAILED, ERR_XPI_VALIDATION_TIMEOUT } from '@/error'
 import { stringify } from '@/utils'
 
 export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
@@ -90,7 +86,6 @@ export async function uploadXpi(
 
   // Send upload request.
   core.info('Start to upload xpi file to firefox addons server.')
-  await requireXpiFileExists(xpiPath)
   const formData = new FormData()
   formData.append('upload', createReadStream(xpiPath))
   formData.append('channel', selfHosted ? 'unlisted' : 'listed')
