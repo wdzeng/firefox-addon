@@ -15,6 +15,11 @@ function isStringToStringMapping(a: unknown): a is Record<string, string> {
   return true
 }
 
+function isValidXpiExtensionName(xpiPath: string) {
+  const ext = xpiPath.split('.').at(-1)
+  return ext === 'zip' || ext === 'xpi' || ext === 'crx'
+}
+
 async function run(
   addonGuid: string,
   license: string | undefined,
@@ -35,6 +40,12 @@ async function run(
 async function main() {
   const addonGuid = core.getInput('addon-guid', { required: true })
   const xpiPath = core.getInput('xpi-path', { required: true })
+  if (!isValidXpiExtensionName(xpiPath)) {
+    core.setFailed('Input "xpi-path" must have a valid extension name (.zip, .xpi, .crx).')
+    core.debug(`xpi-path: ${xpiPath}`)
+    return
+  }
+
   const license = core.getInput('license', { required: false }) || undefined
   let releaseNotes: Record<string, string> | undefined = undefined
   const releaseNotesInput = core.getInput('release-notes', { required: false }) || undefined
