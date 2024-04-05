@@ -5,7 +5,7 @@ import AdmZip from 'adm-zip'
 import tmp from 'tmp'
 
 import { handleError } from '@/error'
-import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon-utils'
+import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
 
 function requireEnvironmentVariable(key: string): string {
   const value = process.env[key]

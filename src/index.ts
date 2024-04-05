@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 
 import { handleError } from '@/error'
-import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon-utils'
+import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
 
 function isStringToStringMapping(a: unknown): a is Record<string, string> {
   if (typeof a !== 'object' || a === null) {
