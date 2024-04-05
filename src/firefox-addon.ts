@@ -5,7 +5,7 @@ import axios from 'axios'
 import FormData from 'form-data'
 import jwt from 'jsonwebtoken'
 
-import type { UploadResponse } from '@/api-types/upload'
+import type { UploadResponse } from '@/api-types'
 import {
   ERR_XPI_VALIDATION_FAILED,
   ERR_XPI_VALIDATION_TIMEOUT,
