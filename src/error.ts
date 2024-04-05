@@ -11,7 +11,7 @@ export const ERR_XPI_VALIDATION_TIMEOUT = 4
 export const ERR_UNKNOWN_HTTP = 254
 export const ERR_UNKNOWN = 255
 
-export function getStringOrError(e: unknown): string | Error {
+function getStringOrError(e: unknown): string | Error {
   return e instanceof Error ? e : stringify(e)
 }
 
