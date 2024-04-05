@@ -26,10 +26,12 @@ an API credential.
 All options are required unless otherwise noted.
 
 - `addon-guid`: add-on's GUID.
-- `xpi-path`: path to the xpi (or zip) file of your add-on generated in the
-  previous workflow steps.
+- `xpi-path`: path to the xpi (zip) file of your add-on generated in the
+  previous workflow steps; must be end with one of `.zip`, `.xpi`, or `.crx`.
 - `license`: (optional) add-on's
   [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
+- `approval-notes`: (optional): a secret text to Mozilla reviewers.
+- `release-notes`: (optional) add-on's release note; this must be a valid JSON string (e.g. `{"en-US":"foo"}`).
 - `self-hosted` (optional) whether the add-on should be self-hosted; default
   `false`.
 - `jwt-issuer`: your jwt issuer.
