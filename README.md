@@ -9,21 +9,20 @@ This action publishes your Firefox add-on to [Firefox Addons](https://addons.moz
 This action can only publish new version of an existing add-on. Publishing a new add-on is not
 supported.
 
-## Prepare
+## Prerequisites
 
 Followings items are required before publishing an add-on:
 
 - An xpi (zip) file to be uploaded.
-- A JWT issuer and secret.
-
-If you have no JWT issuer and secret, go [here](https://addons.mozilla.org/en-US/developers/addon/api/key/)
-to generate an API credential.
+- A JWT issuer and secret. If you do not have a JWT issuer or secret, go
+  [here](https://addons.mozilla.org/en-US/developers/addon/api/key/) to generate an API credential.
 
 ## Usage
 
 All options are required unless otherwise noted.
 
-- `addon-guid`: add-on's GUID.
+- `addon-guid`: add-on's GUID; this value should be the value at
+  `browser_specific_settings.gecko.id` in manifest.json; it may be an email.
 - `xpi-path`: path to the xpi (zip) file of your add-on generated in the previous workflow steps;
   must be end with one of `.zip`, `.xpi`, or `.crx`.
 - `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
@@ -34,8 +33,7 @@ All options are required unless otherwise noted.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
-The add-on's GUID should be the value at `browser_specific_settings.gecko.id` in manifest.json. It
-may be an email.
+Example workflow:
 
 ```yaml
 steps:
