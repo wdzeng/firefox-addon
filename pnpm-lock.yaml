@@ -29,12 +29,21 @@ dependencies:
     version: 9.0.2
 
 devDependencies:
+  '@types/adm-zip':
+    specifier: ^0.5.5
+    version: 0.5.5
   '@types/jsonwebtoken':
     specifier: ^9.0.6
     version: 9.0.6
   '@types/node':
     specifier: ^20.12.4
     version: 20.12.4
+  '@types/tmp':
+    specifier: ^0.2.6
+    version: 0.2.6
+  adm-zip:
+    specifier: ^0.5.12
+    version: 0.5.12
   dotenv:
     specifier: ^16.4.5
     version: 16.4.5
@@ -50,6 +59,9 @@ devDependencies:
   prettier:
     specifier: ^3.2.5
     version: 3.2.5
+  tmp:
+    specifier: ^0.2.3
+    version: 0.2.3
   typescript:
     specifier: ^5.4.4
     version: 5.4.4
@@ -442,6 +454,12 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dev: true
 
+  /@types/adm-zip@0.5.5:
+    resolution: {integrity: sha512-YCGstVMjc4LTY5uK9/obvxBya93axZOVOyf2GSUulADzmLhYE45u2nAssCs/fWBs1Ifq5Vat75JTPwd5XZoPJw==}
+    dependencies:
+      '@types/node': 20.12.4
+    dev: true
+
   /@types/json-schema@7.0.12:
     resolution: {integrity: sha512-Hr5Jfhc9eYOQNPYO5WLDq/n4jqijdHNlDXjuAQkkt+mWdQR+XJToOHrsD4cPaMXpn6KO7y2+wM8AZEs8VpBLVA==}
     dev: true
@@ -468,6 +486,10 @@ packages:
 
   /@types/semver@7.5.0:
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
+    dev: true
+
+  /@types/tmp@0.2.6:
+    resolution: {integrity: sha512-chhaNf2oKHlRkDGt+tiKE2Z5aJ6qalm7Z9rlLdBwmOiAAf09YQvvoLXjWK4HWPF1xU/fqvMgfNfpVoBscA/tKA==}
     dev: true
 
   /@typescript-eslint/eslint-plugin@7.2.0(@typescript-eslint/parser@7.2.0)(eslint@8.57.0)(typescript@5.4.4):
@@ -618,6 +640,11 @@ packages:
     resolution: {integrity: sha512-F0SAmZ8iUtS//m8DmCTA0jlh6TDKkHQyK6xc6V4KDTyZKA9dnvX9/3sRTVQrWm79glUAZbnmmNcdYwUIHWVybw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
+    dev: true
+
+  /adm-zip@0.5.12:
+    resolution: {integrity: sha512-6TVU49mK6KZb4qG6xWaaM4C7sA/sgUMLy/JYMOzkcp3BvVLpW0fXDFQiIzAuxFCt/2+xD7fNIiPFAoLZPhVNLQ==}
+    engines: {node: '>=6.0'}
     dev: true
 
   /ajv@6.12.6:
@@ -2010,6 +2037,11 @@ packages:
 
   /text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
+    dev: true
+
+  /tmp@0.2.3:
+    resolution: {integrity: sha512-nZD7m9iCPC5g0pYmcaxogYKggSfLsdxl8of3Q/oIbqCqLLIO9IAF0GWjX1z9NZRHPiXv8Wex4yDCaZsgEw0Y8w==}
+    engines: {node: '>=14.14'}
     dev: true
 
   /to-regex-range@5.0.1:

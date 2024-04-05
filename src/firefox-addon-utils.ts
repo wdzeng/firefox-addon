@@ -32,13 +32,20 @@ export async function updateAddon(
   addonGuid: string,
   license: undefined | string,
   uploadUuid: string,
-  jwtToken: string
+  jwtToken: string,
+  approvalNotes: string | undefined,
+  releaseNotes: Record<string, string> | undefined
 ) {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
   core.info('Start to update add-on.')
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
-  const body = { upload: uploadUuid, license }
+  const body = {
+    approval_notes: approvalNotes,
+    license,
+    release_notes: releaseNotes,
+    upload: uploadUuid
+  }
   const headers = { Authorization: `jwt ${jwtToken}` }
   await axios.post(url, body, { headers })
   core.info('Add-on updated.')

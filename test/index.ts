@@ -1,5 +1,8 @@
+import fs from 'node:fs'
+
 import * as core from '@actions/core'
-import { AxiosError } from 'axios'
+import AdmZip from 'adm-zip'
+import tmp from 'tmp'
 
 import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon-utils'
@@ -12,29 +15,33 @@ function requireEnvironmentVariable(key: string): string {
   return value
 }
 
-function requireVersionConflictError(e: unknown): void {
-  if (!(e instanceof AxiosError)) {
-    throw e
-  }
-  if (e.response?.status !== 409) {
-    throw e
-  }
-  if (typeof e.response.data !== 'object') {
-    throw e
+function updateVersionAndSaveZip(zipPath: string): void {
+  const zip = new AdmZip(zipPath)
+
+  const manifest = zip.getEntry('manifest.json')
+  if (!manifest) {
+    throw new Error('manifest.json not found in the zip file.')
   }
 
-  const data = e.response.data as object
-  if (!('version' in data)) {
-    throw e
-  }
-  if (!Array.isArray(data.version) || data.version.length !== 1) {
-    throw e
-  }
+  // eslint-disable-next-line unicorn/consistent-function-scoping
+  const toTwoDigit = (n: number) => n.toString().padStart(2, '0')
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const date = now.getDate()
+  const hour = now.getHours()
+  const minute = now.getMinutes()
+  const seconds = now.getSeconds()
+  const version = `${year.toString().slice(-2)}.${month}${toTwoDigit(date)}.${hour}${toTwoDigit(minute)}.${seconds}`
+  core.debug(`Set version to ${version}`)
 
-  const errMsg = data.version[0] as unknown
-  if (errMsg !== 'Version 0.0.0 already exists.') {
-    throw e
-  }
+  // @ts-expect-error: JSON.parse accepts buffer.
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const data: { version: string } = JSON.parse(manifest.getData())
+  data.version = version
+  manifest.setData(JSON.stringify(data))
+
+  zip.writeZip()
 }
 
 async function main() {
@@ -42,20 +49,23 @@ async function main() {
   const jwtIssuer = requireEnvironmentVariable('TEST_JWT_ISSUER')
   const jwtSecret = requireEnvironmentVariable('TEST_JWT_SECRET')
 
-  const xpiPath = 'test/test-addon.zip'
+  const sourceXpiPath = 'test/test-addon.zip'
+  const xpiPath = `${tmp.fileSync().name}.zip`
+  core.debug(`Copy test xpi file to temporary path: ${xpiPath}`)
+  fs.copyFileSync(sourceXpiPath, xpiPath)
+  updateVersionAndSaveZip(xpiPath)
+
   const license = undefined
   const selfHosted = true
 
   try {
     const jwtToken = generateJwtToken(jwtIssuer, jwtSecret)
     const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
-    try {
-      await updateAddon(addonGuid, license, uuid, jwtToken)
-    } catch (e: unknown) {
-      requireVersionConflictError(e)
-      core.info('Version conflict. This is expected result.')
-    }
+    const approvalNotes = 'general update'
+    const releaseNotes = { 'zh-TW': 'improve performance' }
+    await updateAddon(addonGuid, license, uuid, jwtToken, approvalNotes, releaseNotes)
   } catch (e: unknown) {
+    // The test will exit with non-zero code.
     handleError(e)
   }
 }
