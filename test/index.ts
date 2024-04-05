@@ -55,7 +55,7 @@ async function main() {
   fs.copyFileSync(sourceXpiPath, xpiPath)
   updateVersionAndSaveZip(xpiPath)
 
-  const license = undefined
+  const license = 'MIT'
   const selfHosted = true
 
   try {
