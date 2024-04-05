@@ -9,9 +9,9 @@ import type { UploadResponse } from '@/api-types/upload'
 import {
   ERR_XPI_VALIDATION_FAILED,
   ERR_XPI_VALIDATION_TIMEOUT,
-  requireXpiFileExists,
-  stringify
+  requireXpiFileExists
 } from '@/error'
+import { stringify } from '@/utils'
 
 export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   // https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#create-a-jwt-for-each-request

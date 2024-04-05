@@ -3,21 +3,13 @@ import fs from 'node:fs/promises'
 import * as core from '@actions/core'
 import { AxiosError } from 'axios'
 
+import { stringify } from '@/utils'
+
 export const ERR_XPI_FILE = 1
 export const ERR_XPI_VALIDATION_FAILED = 2
 export const ERR_XPI_VALIDATION_TIMEOUT = 4
 export const ERR_UNKNOWN_HTTP = 254
 export const ERR_UNKNOWN = 255
-
-export function stringify(e: unknown): string {
-  if (typeof e === 'object') {
-    return JSON.stringify(e)
-  }
-  if (typeof e === 'string') {
-    return e
-  }
-  return String(e)
-}
 
 export function getStringOrError(e: unknown): string | Error {
   return e instanceof Error ? e : stringify(e)
