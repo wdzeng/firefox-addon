@@ -3,12 +3,11 @@
 [![version](https://img.shields.io/github/v/release/wdzeng/firefox-addon)](https://github.com/wdzeng/firefox-addon/releases/latest)
 [![license](https://img.shields.io/github/license/wdzeng/firefox-addon?color=red)](https://github.com/wdzeng/firefox-addon/blob/main/LICENSE)
 
-This action publishes your Firefox add-on to
-[Firefox Addons](https://addons.mozilla.org/) using the
+This action publishes your Firefox add-on to [Firefox Addons](https://addons.mozilla.org/) using the
 [addons.mozilla.org API v5](https://addons-server.readthedocs.io/en/latest/topics/api/index.html).
 
-This action can only publish new version of an existing add-on. Publishing a new
-add-on is not supported.
+This action can only publish new version of an existing add-on. Publishing a new add-on is not
+supported.
 
 ## Prepare
 
@@ -17,28 +16,26 @@ Followings items are required before publishing an add-on:
 - An xpi (zip) file to be uploaded.
 - A JWT issuer and secret.
 
-If you have no JWT issuer and secret, go
-[here](https://addons.mozilla.org/en-US/developers/addon/api/key/) to generate
-an API credential.
+If you have no JWT issuer and secret, go [here](https://addons.mozilla.org/en-US/developers/addon/api/key/)
+to generate an API credential.
 
 ## Usage
 
 All options are required unless otherwise noted.
 
 - `addon-guid`: add-on's GUID.
-- `xpi-path`: path to the xpi (zip) file of your add-on generated in the
-  previous workflow steps; must be end with one of `.zip`, `.xpi`, or `.crx`.
-- `license`: (optional) add-on's
-  [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
+- `xpi-path`: path to the xpi (zip) file of your add-on generated in the previous workflow steps;
+  must be end with one of `.zip`, `.xpi`, or `.crx`.
+- `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
 - `approval-notes`: (optional): a secret text to Mozilla reviewers.
-- `release-notes`: (optional) add-on's release note; this must be a valid JSON string (e.g. `{"en-US":"foo"}`).
-- `self-hosted` (optional) whether the add-on should be self-hosted; default
-  `false`.
+- `release-notes`: (optional) add-on's release note; this must be a valid JSON string (e.g.
+  `{"en-US":"foo"}`).
+- `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
-The add-on's GUID should be the value at `browser_specific_settings.gecko.id` in
-manifest.json. It may be an email.
+The add-on's GUID should be the value at `browser_specific_settings.gecko.id` in manifest.json. It
+may be an email.
 
 ```yaml
 steps:
