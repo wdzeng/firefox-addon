@@ -55,4 +55,4 @@ steps:
 ## Sister Actions
 
 - [Edge Add-on Action](https://github.com/wdzeng/edge-addon)
-- [Chrome Extension Action](https://github.com/wdzeng/firefox-addon)
+- [Chrome Extension Action](https://github.com/wdzeng/chrome-extension)
