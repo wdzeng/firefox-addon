@@ -49,7 +49,7 @@ steps:
 ## References
 
 - [External API](https://addons-server.readthedocs.io/en/latest/topics/api/index.html)
-- [Add-ons](https://addons-server.readthedocs.io/en/latest/topics/api/addons.html)
+- [Add-ons](https://mozilla.github.io/addons-server/topics/api/addons.html)
 - [Authentication (External)](https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#create-a-jwt-for-each-request)
 
 ## Sister Actions
