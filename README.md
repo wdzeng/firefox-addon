@@ -30,6 +30,8 @@ All options are required unless otherwise noted.
 - `release-notes`: (optional) add-on's release note; this must be a valid JSON string (e.g.
   `{"en-US":"foo"}`).
 - `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
+- `source-file-path` (optional): path to the source file; must be end with one of `.zip`, `.tar.gz`,
+  `.tgz` or `.tar.bz2`.
 - `jwt-issuer`: your jwt issuer.
 - `jwt-secret`: your jwt secret.
 
