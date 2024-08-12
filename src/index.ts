@@ -47,8 +47,7 @@ function requireXpiFileExists(xpiPath: string): void {
 
 function requireValidXpiExtensionName(xpiPath: string) {
   const ext = xpiPath.split('.').at(-1)
-  const ok = ext === 'zip' || ext === 'xpi' || ext === 'crx'
-  if (!ok) {
+  if (!ext || !['zip', 'xpi', 'crx'].includes(ext)) {
     core.setFailed('Input "xpi-path" must have a valid extension name (.zip, .xpi, .crx).')
     core.debug(`xpi-path: ${xpiPath}`)
     process.exit(ERR_XPI_FILE)
