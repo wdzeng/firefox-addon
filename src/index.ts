@@ -62,12 +62,22 @@ async function run(
   jwtIssuer: string,
   jwtSecret: string,
   approvalNotes: string | undefined,
-  releaseNotes: Record<string, string> | undefined
+  releaseNotes: Record<string, string> | undefined,
+  sourceFilePath: string | undefined
 ) {
   core.info('Start to publish add-on.')
   const jwtToken = generateJwtToken(jwtIssuer, jwtSecret)
   const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
-  await updateAddon(addonGuid, license, uuid, jwtToken, approvalNotes, releaseNotes)
+  await updateAddon(
+    addonGuid,
+    license,
+    uuid,
+    jwtToken,
+    approvalNotes,
+    releaseNotes,
+    sourceFilePath,
+    xpiPath
+  )
   core.info('Add-on published.')
 }
 
@@ -83,6 +93,7 @@ async function main() {
   const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
+  const sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
 
   try {
     await run(
@@ -93,7 +104,8 @@ async function main() {
       jwtIssuer,
       jwtSecret,
       approvalNotes,
-      releaseNotes
+      releaseNotes,
+      sourceFilePath
     )
   } catch (e: unknown) {
     handleError(e)

@@ -7,8 +7,13 @@ export const ERR_XPI_FILE = 1
 export const ERR_XPI_VALIDATION_FAILED = 2
 export const ERR_XPI_VALIDATION_TIMEOUT = 4
 export const ERR_INVALID_INPUT = 5
+export const ERR_VERSION_NUMBER = 6
 export const ERR_UNKNOWN_HTTP = 254
 export const ERR_UNKNOWN = 255
+
+export function convertErrorToString(e: unknown): string {
+  return e instanceof Error ? e.message : stringify(e)
+}
 
 function getStringOrError(e: unknown): string | Error {
   return e instanceof Error ? e : stringify(e)

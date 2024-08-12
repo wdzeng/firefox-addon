@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.10.1",
+    "adm-zip": "^0.5.15",
     "axios": "^1.7.3",
     "form-data": "^4.0.0",
     "jsonwebtoken": "^9.0.2"
@@ -28,7 +29,6 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.15",
     "@types/tmp": "^0.2.6",
-    "adm-zip": "^0.5.15",
     "dotenv": "^16.4.5",
     "esbuild": "^0.23.0",
     "eslint": "^8.57.0",

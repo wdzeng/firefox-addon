@@ -15,6 +15,9 @@ importers:
       '@actions/core':
         specifier: ^1.10.1
         version: 1.10.1
+      adm-zip:
+        specifier: ^0.5.15
+        version: 0.5.15
       axios:
         specifier: ^1.7.3
         version: 1.7.3
@@ -37,9 +40,6 @@ importers:
       '@types/tmp':
         specifier: ^0.2.6
         version: 0.2.6
-      adm-zip:
-        specifier: ^0.5.15
-        version: 0.5.15
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5

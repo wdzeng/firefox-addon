@@ -1,12 +1,18 @@
 import { createReadStream } from 'node:fs'
 
 import * as core from '@actions/core'
+import AdmZip from 'adm-zip'
 import axios from 'axios'
 import FormData from 'form-data'
 import jwt from 'jsonwebtoken'
 
 import type { UploadResponse } from '@/api-types'
-import { ERR_XPI_VALIDATION_FAILED, ERR_XPI_VALIDATION_TIMEOUT } from '@/error'
+import {
+  ERR_VERSION_NUMBER,
+  ERR_XPI_VALIDATION_FAILED,
+  ERR_XPI_VALIDATION_TIMEOUT,
+  convertErrorToString
+} from '@/error'
 import { stringify } from '@/utils'
 
 export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
@@ -24,17 +30,17 @@ export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   return jwtToken
 }
 
-export async function updateAddon(
+async function createVersion(
   addonGuid: string,
-  license: undefined | string,
-  uploadUuid: string,
   jwtToken: string,
   approvalNotes: string | undefined,
-  releaseNotes: Record<string, string> | undefined
+  license: string | undefined,
+  releaseNotes: Record<string, string> | undefined,
+  uploadUuid: string
 ) {
+  core.info('Start to create a version.')
+
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
-  // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
-  core.info('Start to update add-on.')
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
   const body = {
     approval_notes: approvalNotes,
@@ -44,7 +50,114 @@ export async function updateAddon(
   }
   const headers = { Authorization: `jwt ${jwtToken}` }
   await axios.post(url, body, { headers })
-  core.info('Add-on updated.')
+
+  core.info('Version created.')
+}
+
+async function createVersionSource(
+  addonGuid: string,
+  jwtToken: string,
+  license: string | undefined,
+  sourceFilePath: string,
+  uploadUuid: string
+) {
+  core.info('Start to create a version source.')
+
+  // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
+  const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
+  const formData = new FormData()
+  formData.append('upload', uploadUuid)
+  formData.append('source', createReadStream(sourceFilePath))
+  if (license) {
+    formData.append('license', license)
+  }
+  const headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
+  await axios.post(url, formData, { headers })
+
+  core.info('Version source created.')
+}
+
+async function patchVersionSource(
+  addonGuid: string,
+  versionNumber: string,
+  jwtToken: string,
+  license: string | undefined,
+  sourceFilePath: string
+) {
+  core.info('Start to patch a version source.')
+
+  // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
+  const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/${versionNumber}/`
+  const formData = new FormData()
+  formData.append('source', createReadStream(sourceFilePath))
+  if (license) {
+    formData.append('license', license)
+  }
+  const headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
+  await axios.patch(url, formData, { headers })
+
+  core.info('Version source patched.')
+}
+
+function getAddonVersionNumber(xpiFilePath: string): string {
+  const zip = new AdmZip(xpiFilePath)
+  let manifest: string
+  try {
+    manifest = zip.readAsText('manifest.json', 'utf8')
+  } catch (e: unknown) {
+    core.setFailed('Error getting addon version because failed to read manifest.json.')
+    core.debug(convertErrorToString(e))
+    process.exit(ERR_VERSION_NUMBER)
+  }
+
+  let manifest_json: unknown
+  try {
+    manifest_json = JSON.parse(manifest)
+  } catch {
+    core.setFailed(
+      'Error getting addon version because failed to parse manifest.json. Is it a valid JSON file?'
+    )
+    core.debug(`manifest.json: ${manifest}`)
+    process.exit(ERR_VERSION_NUMBER)
+  }
+
+  if (
+    manifest_json === null ||
+    typeof manifest_json !== 'object' ||
+    !('version' in manifest_json) ||
+    typeof manifest_json.version !== 'string' ||
+    !manifest_json.version
+  ) {
+    core.setFailed('Error getting addon version. Does manifest.json have a valid version field?')
+    core.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
+    process.exit(ERR_VERSION_NUMBER)
+  }
+
+  const version = manifest_json.version
+  return version.startsWith('v') ? version : `v${version}`
+}
+
+export async function updateAddon(
+  addonGuid: string,
+  license: undefined | string,
+  uploadUuid: string,
+  jwtToken: string,
+  approvalNotes: string | undefined,
+  releaseNotes: Record<string, string> | undefined,
+  sourceFilePath: string | undefined,
+  xpiPath: string
+) {
+  if (sourceFilePath) {
+    if (approvalNotes !== undefined || releaseNotes !== undefined) {
+      const versionNumber = getAddonVersionNumber(xpiPath)
+      await createVersion(addonGuid, jwtToken, approvalNotes, license, releaseNotes, uploadUuid)
+      await patchVersionSource(addonGuid, versionNumber, jwtToken, license, sourceFilePath)
+    } else {
+      await createVersionSource(addonGuid, jwtToken, license, sourceFilePath, uploadUuid)
+    }
+  } else {
+    await createVersion(addonGuid, jwtToken, approvalNotes, license, releaseNotes, uploadUuid)
+  }
 }
 
 async function waitUntilXpiValidated(uploadUuid: string, jwtToken: string): Promise<void> {
