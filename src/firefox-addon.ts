@@ -11,6 +11,7 @@ import {
   ERR_VERSION_NUMBER,
   ERR_XPI_VALIDATION_FAILED,
   ERR_XPI_VALIDATION_TIMEOUT,
+  FirefoxAddonActionError,
   convertErrorToString
 } from '@/error'
 import { stringify } from '@/utils'
@@ -101,39 +102,43 @@ async function patchVersionSource(
 
 function getAddonVersionNumber(xpiFilePath: string): string {
   const zip = new AdmZip(xpiFilePath)
-  let manifest: string
+  let manifest_content: string
   try {
-    manifest = zip.readAsText('manifest.json', 'utf8')
+    manifest_content = zip.readAsText('manifest.json', 'utf8')
   } catch (e: unknown) {
-    core.setFailed('Error getting addon version because failed to read manifest.json.')
     core.debug(convertErrorToString(e))
-    process.exit(ERR_VERSION_NUMBER)
+    throw new FirefoxAddonActionError(
+      'Error getting addon version because failed to read manifest.json.',
+      ERR_VERSION_NUMBER
+    )
   }
 
   let manifest_json: unknown
+  let ok = true
   try {
-    manifest_json = JSON.parse(manifest)
+    manifest_json = JSON.parse(manifest_content)
+    ok = manifest_json !== null && typeof manifest_json === 'object'
   } catch {
-    core.setFailed(
-      'Error getting addon version because failed to parse manifest.json. Is it a valid JSON file?'
-    )
-    core.debug(`manifest.json: ${manifest}`)
-    process.exit(ERR_VERSION_NUMBER)
+    ok = false
   }
-
-  if (
-    manifest_json === null ||
-    typeof manifest_json !== 'object' ||
-    !('version' in manifest_json) ||
-    typeof manifest_json.version !== 'string' ||
-    !manifest_json.version
-  ) {
-    core.setFailed('Error getting addon version. Does manifest.json have a valid version field?')
+  if (!ok) {
     core.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
-    process.exit(ERR_VERSION_NUMBER)
+    throw new FirefoxAddonActionError(
+      'Error getting addon version because failed to parse manifest.json. Is it a valid JSON file?',
+      ERR_VERSION_NUMBER
+    )
   }
 
-  const version = manifest_json.version
+  const manifest = manifest_json as Record<string, unknown>
+  if (typeof manifest.version !== 'string' || !manifest.version) {
+    core.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
+    throw new FirefoxAddonActionError(
+      'Error getting addon version. Does manifest.json have a valid version field?',
+      ERR_VERSION_NUMBER
+    )
+  }
+
+  const version = manifest.version
   return version.startsWith('v') ? version : `v${version}`
 }
 
@@ -181,12 +186,14 @@ async function waitUntilXpiValidated(uploadUuid: string, jwtToken: string): Prom
       }
 
       const validationMsg = stringify(response.data.validation)
-      core.setFailed(`xpi processed, but not valid:\n${validationMsg}`)
-      process.exit(ERR_XPI_VALIDATION_FAILED)
+      throw new FirefoxAddonActionError(validationMsg, ERR_XPI_VALIDATION_FAILED)
     }
   }
 
-  process.exit(ERR_XPI_VALIDATION_TIMEOUT)
+  throw new FirefoxAddonActionError(
+    'Timeout waiting for xpi validation.',
+    ERR_XPI_VALIDATION_TIMEOUT
+  )
 }
 
 export async function uploadXpi(

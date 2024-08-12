@@ -22,7 +22,8 @@
     "adm-zip": "^0.5.15",
     "axios": "^1.7.3",
     "form-data": "^4.0.0",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "ts-custom-error": "^3.3.1"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.5",
