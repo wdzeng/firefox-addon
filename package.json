@@ -12,7 +12,8 @@
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
     "transpile": "esbuild src/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/index.cjs",
-    "test": "pnpm test:upload",
+    "test": "pnpm unttest && pnpm test:upload",
+    "unittest": "vitest --silent",
     "test:upload": "pnpm clean && pnpm transpile:test:upload && node -r dotenv/config dist/test/upload.cjs dotenv_config_path=test/.env.local",
     "transpile:test:upload": "esbuild test/upload.ts --platform=node --target=node20 --minify --bundle --outfile=dist/test/upload.cjs",
     "lint": "eslint src --fix",
@@ -30,6 +31,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.14.15",
     "@types/tmp": "^0.2.6",
+    "axios-mock-adapter": "^2.0.0",
     "dotenv": "^16.4.5",
     "esbuild": "^0.23.0",
     "eslint": "^8.57.0",

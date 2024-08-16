@@ -14,7 +14,7 @@ export function stringify(e: unknown): string {
   return String(e)
 }
 
-export function isStringToStringMapping(a: unknown): a is Record<string, string> {
+function isStringToStringMapping(a: unknown): a is Record<string, string> {
   if (typeof a !== 'object' || a === null) {
     return false
   }

@@ -201,7 +201,7 @@ async function waitUntilXpiValidated(uploadUuid: string, jwtToken: string): Prom
   )
 }
 
-export async function uploadXpi(
+async function createUpload(
   xpiPath: string,
   jwtToken: string,
   selfHosted: boolean
