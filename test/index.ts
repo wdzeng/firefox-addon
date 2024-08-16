@@ -38,12 +38,27 @@ SwECHgMUAAAACACtpCJXncQPnp0AAAAZAQAADQAYAAAAAAABAAAApIE2AwAAbWFuaWZlc3QuanNv
 blVUBQADhSzzZHV4CwABBOgDAAAE6AMAAFBLBQYAAAAABgAGAAICAAAaBAAAAAA=
 `
 
-function requireEnvironmentVariable(key: string): string {
-  const value = process.env[key]
-  if (!value) {
-    throw new Error(`Environment variable ${key} is required.`)
+function getEnv(): {
+  addonGuid: string
+  jwtIssuer: string
+  jwtSecret: string
+} {
+  const addonGuid = process.env.TEST_ADDON_GUID
+  const jwtIssuer = process.env.TEST_JWT_ISSUER
+  const jwtSecret = process.env.TEST_JWT_SECRET
+  if (!addonGuid || !jwtIssuer || !jwtSecret) {
+    if (process.env.GITHUB_ACTIONS) {
+      core.setFailed(
+        'Environment variables TEST_ADDON_GUID, TEST_JWT_ISSUER and TEST_JWT_SECRET are required. Did you set the secrets?'
+      )
+      process.exit(1)
+    }
+
+    throw new Error(
+      'Environment variables TEST_ADDON_GUID, TEST_JWT_ISSUER and TEST_JWT_SECRET are required. Did you have a .env.local file?'
+    )
   }
-  return value
+  return { addonGuid, jwtIssuer, jwtSecret }
 }
 
 function updateVersionAndSaveZip(zipPath: string): void {
@@ -76,10 +91,7 @@ function updateVersionAndSaveZip(zipPath: string): void {
 }
 
 async function main() {
-  const addonGuid = requireEnvironmentVariable('TEST_ADDON_GUID')
-  const jwtIssuer = requireEnvironmentVariable('TEST_JWT_ISSUER')
-  const jwtSecret = requireEnvironmentVariable('TEST_JWT_SECRET')
-
+  const { addonGuid, jwtIssuer, jwtSecret } = getEnv()
   const xpiPath = `${tmp.fileSync().name}.zip`
   fs.writeFileSync(xpiPath, TEST_ADDON, 'base64')
   updateVersionAndSaveZip(xpiPath)
