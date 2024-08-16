@@ -1,3 +1,7 @@
+import fs from 'node:fs'
+
+import { ERR_INVALID_INPUT, FirefoxAddonActionError } from './error'
+
 export function stringify(e: unknown): string {
   if (typeof e === 'object') {
     return JSON.stringify(e)
@@ -18,4 +22,62 @@ export function isStringToStringMapping(a: unknown): a is Record<string, string>
     }
   }
   return true
+}
+
+export function requireFileExists(path: string): void {
+  try {
+    const s = fs.statSync(path)
+    if (!s.isFile()) {
+      throw new FirefoxAddonActionError(`Not a regular file: ${path}`, ERR_INVALID_INPUT)
+    }
+  } catch {
+    throw new FirefoxAddonActionError(`File not found: ${path}`, ERR_INVALID_INPUT)
+  }
+}
+
+export function validateAndParseReleaseNotesInput(
+  releaseNotesInput: string | undefined
+): Record<string, string> | undefined {
+  if (!releaseNotesInput) {
+    return undefined
+  }
+
+  let ret: unknown
+  try {
+    ret = JSON.parse(releaseNotesInput)
+  } catch {
+    throw new FirefoxAddonActionError(
+      `Input "release-notes" is not a valid JSON string: ${releaseNotesInput}`,
+      ERR_INVALID_INPUT
+    )
+  }
+
+  if (!isStringToStringMapping(ret)) {
+    throw new FirefoxAddonActionError(
+      `Input "release-notes" is not a string-to-string mapping: ${JSON.stringify(ret)}`,
+      ERR_INVALID_INPUT
+    )
+  }
+
+  return Object.keys(ret).length ? ret : undefined
+}
+
+export function requireValidXpiFileExtensionName(path: string) {
+  const allowedExtensions = ['.zip', '.xpi', '.crx']
+  if (!allowedExtensions.some(ext => path.endsWith(ext))) {
+    throw new FirefoxAddonActionError(
+      `Input "xpi-path" must have a valid extension name (.zip, .xpi, .crx): ${path}`,
+      ERR_INVALID_INPUT
+    )
+  }
+}
+
+export function requireValidSourceFileExtensionName(path: string) {
+  const allowedExtensions = ['.zip', '.tar.gz', '.tgz', '.tar.bz2']
+  if (!allowedExtensions.some(ext => path.endsWith(ext))) {
+    throw new FirefoxAddonActionError(
+      `Input "source-file-path" must have a valid extension name (.zip, .tar.gz, .tgz, .tar.bz2): ${path}`,
+      ERR_INVALID_INPUT
+    )
+  }
 }

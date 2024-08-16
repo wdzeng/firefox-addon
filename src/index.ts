@@ -1,70 +1,13 @@
-import fs from 'node:fs'
-
 import * as core from '@actions/core'
 
-import { ERR_INVALID_INPUT, FirefoxAddonActionError, handleError } from '@/error'
+import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
-import { isStringToStringMapping } from '@/utils'
-
-function parseReleaseNotes(): undefined | Record<string, string> {
-  const releaseNotesInput = core.getInput('release-notes', { required: false })
-
-  if (!releaseNotesInput) {
-    return undefined
-  }
-
-  let ret: unknown
-  try {
-    ret = JSON.parse(releaseNotesInput)
-  } catch {
-    core.debug(`release-notes: ${releaseNotesInput}`)
-    throw new FirefoxAddonActionError(
-      'Input "release-notes" is not a valid JSON string.',
-      ERR_INVALID_INPUT
-    )
-  }
-
-  if (!isStringToStringMapping(ret)) {
-    core.debug(`release-notes: ${releaseNotesInput}`)
-    throw new FirefoxAddonActionError(
-      'Input "release-notes" is not a string-to-string mapping.',
-      ERR_INVALID_INPUT
-    )
-  }
-
-  return ret
-}
-
-function requireXpiFileExists(xpiPath: string): void {
-  try {
-    const s = fs.statSync(xpiPath)
-    if (!s.isFile()) {
-      throw new FirefoxAddonActionError(`Not a regular file: ${xpiPath}`, ERR_INVALID_INPUT)
-    }
-  } catch {
-    throw new FirefoxAddonActionError(`File not found: ${xpiPath}`, ERR_INVALID_INPUT)
-  }
-}
-
-function requireValidXpiExtensionName(xpiPath: string) {
-  const ext = xpiPath.split('.').at(-1)
-  if (!ext || !['zip', 'xpi', 'crx'].includes(ext)) {
-    throw new FirefoxAddonActionError(
-      'Input "xpi-path" must have a valid extension name (.zip, .xpi, .crx).',
-      ERR_INVALID_INPUT
-    )
-  }
-}
-
-function requireValidSourceFileExtensionName(f: string) {
-  if (f.endsWith('.zip') || f.endsWith('.tar.gz') || f.endsWith('.tgz') || f.endsWith('.tar.bz2')) {
-    return
-  }
-  throw new FirefoxAddonActionError(
-    'Input "source-file-path" must have a valid extension name (.zip, .tar.gz, .tgz, .tar.bz2).',
-    ERR_INVALID_INPUT
-  )
-}
+import {
+  requireFileExists,
+  requireValidSourceFileExtensionName,
+  requireValidXpiFileExtensionName,
+  validateAndParseReleaseNotesInput
+} from '@/utils'
 
 async function run(
   addonGuid: string,
@@ -95,22 +38,24 @@ async function run(
 
 async function main() {
   const addonGuid = core.getInput('addon-guid', { required: true })
-  const xpiPath = core.getInput('xpi-path', { required: true })
-  requireValidXpiExtensionName(xpiPath)
-  requireXpiFileExists(xpiPath)
-
-  const license = core.getInput('license', { required: false }) || undefined
-  const releaseNotes = parseReleaseNotes()
-  const approvalNotes = core.getInput('approval-notes', { required: false }) || undefined
-  const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
+  const xpiPath = core.getInput('xpi-path', { required: true })
+  const approvalNotes = core.getInput('approval-notes', { required: false }) || undefined
+  const license = core.getInput('license', { required: false }) || undefined
+  const releaseNotesInput = core.getInput('release-notes', { required: false }) || undefined
+  const selfHosted = core.getBooleanInput('self-hosted')
   const sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
-  if (sourceFilePath) {
-    requireValidSourceFileExtensionName(sourceFilePath)
-  }
 
   try {
+    const releaseNotes = validateAndParseReleaseNotesInput(releaseNotesInput)
+    if (sourceFilePath) {
+      requireValidSourceFileExtensionName(sourceFilePath)
+      requireFileExists(sourceFilePath)
+    }
+    requireValidXpiFileExtensionName(xpiPath)
+    requireFileExists(xpiPath)
+
     await run(
       addonGuid,
       license,
