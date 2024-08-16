@@ -12,8 +12,9 @@
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
     "transpile": "esbuild src/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/index.cjs",
-    "test": "pnpm clean && pnpm transpile:test && node -r dotenv/config dist/test/index.cjs dotenv_config_path=test/.env.local",
-    "transpile:test": "esbuild test/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/test/index.cjs",
+    "test": "pnpm test:upload",
+    "test:upload": "pnpm clean && pnpm transpile:test:upload && node -r dotenv/config dist/test/upload.cjs dotenv_config_path=test/.env.local",
+    "transpile:test:upload": "esbuild test/upload.ts --platform=node --target=node20 --minify --bundle --outfile=dist/test/upload.cjs",
     "lint": "eslint src --fix",
     "clean": "rm -rf dist"
   },
@@ -36,6 +37,7 @@
     "prettier": "^3.3.3",
     "tmp": "^0.2.3",
     "typescript": "^5.5.4",
+    "vite-tsconfig-paths": "^5.0.1",
     "vitest": "^2.0.5"
   },
   "pnpm": {

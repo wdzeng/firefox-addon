@@ -1,3 +1,6 @@
+// This is not a unit test, but a test to upload a testing xpi file to the real Firefox Add-on
+// server.
+
 import fs from 'node:fs'
 
 import * as core from '@actions/core'
