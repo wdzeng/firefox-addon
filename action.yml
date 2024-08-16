@@ -9,6 +9,9 @@ inputs:
   xpi-path:
     description: Path to the add-on zip file.
     required: true
+  source-code-path:
+    description: Path to the add-on source code.
+    required: false
   self-hosted:
     description: Whether the add-on should be self-hosted. Default false.
     required: false
