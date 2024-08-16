@@ -2,7 +2,7 @@ import fs from 'node:fs'
 
 import * as core from '@actions/core'
 
-import { ERR_INVALID_INPUT, ERR_XPI_FILE, handleError } from '@/error'
+import { ERR_INVALID_INPUT, FirefoxAddonActionError, handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
 import { isStringToStringMapping } from '@/utils'
 
@@ -17,15 +17,19 @@ function parseReleaseNotes(): undefined | Record<string, string> {
   try {
     ret = JSON.parse(releaseNotesInput)
   } catch {
-    core.setFailed('Input "release-notes" is not a valid JSON string.')
     core.debug(`release-notes: ${releaseNotesInput}`)
-    process.exit(ERR_INVALID_INPUT)
+    throw new FirefoxAddonActionError(
+      'Input "release-notes" is not a valid JSON string.',
+      ERR_INVALID_INPUT
+    )
   }
 
   if (!isStringToStringMapping(ret)) {
-    core.setFailed('Input "release-notes" is not a string-to-string mapping.')
     core.debug(`release-notes: ${releaseNotesInput}`)
-    process.exit(ERR_INVALID_INPUT)
+    throw new FirefoxAddonActionError(
+      'Input "release-notes" is not a string-to-string mapping.',
+      ERR_INVALID_INPUT
+    )
   }
 
   return ret
@@ -35,22 +39,20 @@ function requireXpiFileExists(xpiPath: string): void {
   try {
     const s = fs.statSync(xpiPath)
     if (!s.isFile()) {
-      core.setFailed(`Not a regular file: ${xpiPath}`)
-      process.exit(ERR_XPI_FILE)
+      throw new FirefoxAddonActionError(`Not a regular file: ${xpiPath}`, ERR_INVALID_INPUT)
     }
-    core.debug('The xpi file exists and is a regular file.')
   } catch {
-    core.setFailed(`File not found: ${xpiPath}`)
-    process.exit(ERR_XPI_FILE)
+    throw new FirefoxAddonActionError(`File not found: ${xpiPath}`, ERR_INVALID_INPUT)
   }
 }
 
 function requireValidXpiExtensionName(xpiPath: string) {
   const ext = xpiPath.split('.').at(-1)
   if (!ext || !['zip', 'xpi', 'crx'].includes(ext)) {
-    core.setFailed('Input "xpi-path" must have a valid extension name (.zip, .xpi, .crx).')
-    core.debug(`xpi-path: ${xpiPath}`)
-    process.exit(ERR_XPI_FILE)
+    throw new FirefoxAddonActionError(
+      'Input "xpi-path" must have a valid extension name (.zip, .xpi, .crx).',
+      ERR_INVALID_INPUT
+    )
   }
 }
 
@@ -58,11 +60,10 @@ function requireValidSourceFileExtensionName(f: string) {
   if (f.endsWith('.zip') || f.endsWith('.tar.gz') || f.endsWith('.tgz') || f.endsWith('.tar.bz2')) {
     return
   }
-  core.setFailed(
-    'Input "source-file-path" must have a valid extension name (.zip, .tar.gz, .tgz, .tar.bz2).'
+  throw new FirefoxAddonActionError(
+    'Input "source-file-path" must have a valid extension name (.zip, .tar.gz, .tgz, .tar.bz2).',
+    ERR_INVALID_INPUT
   )
-  core.debug(`source-file-path: ${f}`)
-  process.exit(ERR_INVALID_INPUT)
 }
 
 async function run(
