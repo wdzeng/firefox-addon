@@ -14,26 +14,25 @@ supported.
 Followings items are required before publishing an add-on:
 
 - An xpi (zip) file to be uploaded.
-- A JWT issuer and secret. If you do not have a JWT issuer or secret, go
-  [here](https://addons.mozilla.org/en-US/developers/addon/api/key/) to generate an API credential.
+- A JWT issuer and secret. If you do not have a JWT issuer or secret, go [here](https://addons.mozilla.org/en-US/developers/addon/api/key/)
+  to generate an API credential.
 
 ## Usage
 
-All options are required unless otherwise noted.
-
-- `addon-guid`: add-on's GUID; this value should be the value at
-  `browser_specific_settings.gecko.id` in manifest.json; it may be an email.
-- `xpi-path`: path to the xpi (zip) file of your add-on generated in the previous workflow steps;
-  must be end with one of `.zip`, `.xpi`, or `.crx`.
-- `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
+- `addon-guid`: (required) add-on's GUID; this value should be the value at
+  `browser_specific_settings.gecko.id` in manifest.json; it may be an email or something like
+  `{xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx}`.
+- `jwt-issuer`: (required) your jwt issuer.
+- `jwt-secret`: (required) your jwt secret.
+- `xpi-path`: (required) path to the xpi (zip) file of your add-on generated in the previous
+   workflow steps; must be end with one of `.zip`, `.xpi`, or `.crx`.
 - `approval-notes`: (optional): a secret text to Mozilla reviewers.
+- `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
 - `release-notes`: (optional) add-on's release note; this must be a valid JSON string (e.g.
   `{"en-US":"foo"}`).
 - `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
 - `source-file-path` (optional): path to the source file; must be end with one of `.zip`, `.tar.gz`,
   `.tgz` or `.tar.bz2`.
-- `jwt-issuer`: your jwt issuer.
-- `jwt-secret`: your jwt secret.
 
 Example workflow:
 
