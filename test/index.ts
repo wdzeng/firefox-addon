@@ -7,6 +7,7 @@ import tmp from 'tmp'
 
 import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
+import { isGitHubAction } from '@/utils'
 
 const TEST_ADDON = `
 UEsDBAoAAAAAACY8rlQAAAAAAAAAAAAAAAAQABwAY29udGVudF9zY3JpcHRzL1VUCQADuOp+Ytll
@@ -46,10 +47,6 @@ async function getAddonLastUpdate(addonGuid: string, jwtToken: string): Promise<
   const res = await axios.get<{ last_updated: string }>(url, { headers })
   const lastUpdate = res.data.last_updated // ISO8601
   return new Date(lastUpdate).getTime()
-}
-
-function isGitHubAction(): boolean {
-  return Boolean(process.env.GITHUB_ACTIONS)
 }
 
 function isMainGitHubAction(): boolean {

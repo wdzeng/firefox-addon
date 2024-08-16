@@ -1,6 +1,5 @@
 import { createReadStream } from 'node:fs'
 
-import * as core from '@actions/core'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
 import jwt from 'jsonwebtoken'
@@ -13,11 +12,11 @@ import {
   FirefoxAddonActionError,
   convertErrorToString
 } from '@/error'
-import { stringify } from '@/utils'
+import { logger, stringify } from '@/utils'
 
 export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   // https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#create-a-jwt-for-each-request
-  core.info('Start to generate JWT token.')
+  logger.info('Start to generate JWT token.')
   const issuedAt = Math.floor(Date.now() / 1000) // Remove milliseconds.
   const payload = {
     exp: issuedAt + 5 * 60, // Set expiration time to 5 minutes.
@@ -26,7 +25,7 @@ export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
     jti: Math.random().toString()
   }
   const jwtToken = jwt.sign(payload, jwtSecret, { algorithm: 'HS256' })
-  core.info('JWT token generated.')
+  logger.info('JWT token generated.')
   return jwtToken
 }
 
@@ -38,7 +37,7 @@ async function createVersion(
   releaseNotes: Record<string, string> | undefined,
   uploadUuid: string
 ) {
-  core.info('Start to create a version.')
+  logger.info('Start to create a version.')
 
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-create
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
@@ -51,7 +50,7 @@ async function createVersion(
   const headers = { Authorization: `jwt ${jwtToken}` }
   await axios.post(url, body, { headers })
 
-  core.info('Version created.')
+  logger.info('Version created.')
 }
 
 async function createVersionSource(
@@ -61,7 +60,7 @@ async function createVersionSource(
   sourceFilePath: string,
   uploadUuid: string
 ) {
-  core.info('Start to create a version source.')
+  logger.info('Start to create a version source.')
 
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
@@ -77,7 +76,7 @@ async function createVersionSource(
   }
   await axios.post(url, formData, { headers })
 
-  core.info('Version source created.')
+  logger.info('Version source created.')
 }
 
 async function patchVersionSource(
@@ -87,7 +86,7 @@ async function patchVersionSource(
   license: string | undefined,
   sourceFilePath: string
 ) {
-  core.info('Start to patch a version source.')
+  logger.info('Start to patch a version source.')
 
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/${versionNumber}/`
@@ -102,7 +101,7 @@ async function patchVersionSource(
   }
   await axios.patch(url, formData, { headers })
 
-  core.info('Version source patched.')
+  logger.info('Version source patched.')
 }
 
 function getAddonVersionNumber(xpiFilePath: string): string {
@@ -111,7 +110,7 @@ function getAddonVersionNumber(xpiFilePath: string): string {
   try {
     manifest_content = zip.readAsText('manifest.json', 'utf8')
   } catch (e: unknown) {
-    core.debug(convertErrorToString(e))
+    logger.debug(convertErrorToString(e))
     throw new FirefoxAddonActionError(
       'Error getting addon version because failed to read manifest.json.',
       ERR_VERSION_NUMBER
@@ -127,7 +126,7 @@ function getAddonVersionNumber(xpiFilePath: string): string {
     ok = false
   }
   if (!ok) {
-    core.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
+    logger.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
     throw new FirefoxAddonActionError(
       'Error getting addon version because failed to parse manifest.json. Is it a valid JSON file?',
       ERR_VERSION_NUMBER
@@ -136,7 +135,7 @@ function getAddonVersionNumber(xpiFilePath: string): string {
 
   const manifest = manifest_json as Record<string, unknown>
   if (typeof manifest.version !== 'string' || !manifest.version) {
-    core.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
+    logger.debug(`manifest.json: ${JSON.stringify(manifest_json)}`)
     throw new FirefoxAddonActionError(
       'Error getting addon version. Does manifest.json have a valid version field?',
       ERR_VERSION_NUMBER
@@ -179,10 +178,10 @@ async function waitUntilXpiValidated(uploadUuid: string, jwtToken: string): Prom
   const headers = { Authorization: `jwt ${jwtToken}` }
 
   while (Date.now() < endTime) {
-    core.info('xpi not yet validated. Wait 5 seconds.')
+    logger.info('xpi not yet validated. Wait 5 seconds.')
     await new Promise(res => setTimeout(res, 5000))
 
-    core.info('Checking if xpi is validated.')
+    logger.info('Checking if xpi is validated.')
     const response = await axios<UploadResponse>(url, { headers })
 
     if (response.data.processed) {
@@ -210,7 +209,7 @@ export async function uploadXpi(
   const url = 'https://addons.mozilla.org/api/v5/addons/upload/'
 
   // Send upload request.
-  core.info('Start to upload xpi file to firefox addons server.')
+  logger.info('Start to upload xpi file to firefox addons server.')
   const formData = new FormData()
   formData.append('upload', createReadStream(xpiPath))
   formData.append('channel', selfHosted ? 'unlisted' : 'listed')
@@ -219,12 +218,12 @@ export async function uploadXpi(
     'Content-Type': 'multipart/form-data'
   }
   const response = await axios.post<UploadResponse>(url, formData, { headers })
-  core.info('xpi file uploaded.')
+  logger.info('xpi file uploaded.')
 
   // Wait until xpi is validated.
   const uploadUuid = response.data.uuid
   await waitUntilXpiValidated(uploadUuid, jwtToken)
 
-  core.info('xpi processed.')
+  logger.info('xpi processed.')
   return uploadUuid
 }

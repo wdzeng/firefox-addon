@@ -1,8 +1,7 @@
-import * as core from '@actions/core'
 import { AxiosError } from 'axios'
 import { CustomError } from 'ts-custom-error'
 
-import { stringify } from '@/utils'
+import { logger, stringify } from '@/utils'
 
 export const ERR_XPI_VALIDATION_FAILED = 2
 export const ERR_XPI_VALIDATION_TIMEOUT = 4
@@ -30,7 +29,7 @@ function getStringOrError(e: unknown): string | Error {
 
 export function handleError(error: unknown): never {
   if (error instanceof FirefoxAddonActionError) {
-    core.setFailed(error.message)
+    logger.setFailed(error.message)
     process.exit(error.code)
   }
 
@@ -38,11 +37,11 @@ export function handleError(error: unknown): never {
   if (error instanceof AxiosError) {
     if (error.response) {
       // Got response from FireFox API server with status code 4XX or 5XX.
-      core.setFailed(`Firefox API server responses with error code: ${error.response.status}`)
-      core.setFailed(getStringOrError(error.response.data))
+      logger.setFailed(`Firefox API server responses with error code: ${error.response.status}`)
+      logger.setFailed(getStringOrError(error.response.data))
     } else {
       // Incomplete HTTP request. This may be due to instable network environment.
-      core.setFailed(error.message)
+      logger.setFailed(error.message)
     }
     process.exit(ERR_UNKNOWN_HTTP)
   }
@@ -52,11 +51,11 @@ export function handleError(error: unknown): never {
   if (str_err.length > 256) {
     str_err = `${str_err.slice(0, 256)} <truncated>`
   }
-  core.debug(str_err)
+  logger.debug(str_err)
   if (error instanceof Error) {
-    core.setFailed(`Unknown error occurred: ${error.message}`)
+    logger.setFailed(`Unknown error occurred: ${error.message}`)
   } else {
-    core.setFailed('Unknown error occurred.')
+    logger.setFailed('Unknown error occurred.')
   }
   process.exit(ERR_UNKNOWN)
 }
