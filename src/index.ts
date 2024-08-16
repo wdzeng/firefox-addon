@@ -54,6 +54,17 @@ function requireValidXpiExtensionName(xpiPath: string) {
   }
 }
 
+function requireValidSourceFileExtensionName(f: string) {
+  if (f.endsWith('.zip') || f.endsWith('.tar.gz') || f.endsWith('.tgz') || f.endsWith('.tar.bz2')) {
+    return
+  }
+  core.setFailed(
+    'Input "source-file-path" must have a valid extension name (.zip, .tar.gz, .tgz, .tar.bz2).'
+  )
+  core.debug(`source-file-path: ${f}`)
+  process.exit(ERR_INVALID_INPUT)
+}
+
 async function run(
   addonGuid: string,
   license: string | undefined,
@@ -94,6 +105,9 @@ async function main() {
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
   const sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
+  if (sourceFilePath) {
+    requireValidSourceFileExtensionName(sourceFilePath)
+  }
 
   try {
     await run(
