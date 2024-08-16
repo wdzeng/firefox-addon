@@ -28,11 +28,7 @@ Followings items are required before publishing an add-on:
    workflow steps; must be end with one of `.zip`, `.xpi`, or `.crx`.
 - `approval-notes`: (optional): a secret text to Mozilla reviewers.
 - `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
-- `release-notes`: (optional) add-on's release note; this must be a valid JSON string (e.g.
-  `{"en-US":"foo"}`).
 - `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
-- `source-file-path` (optional): path to the source file; must be end with one of `.zip`, `.tar.gz`,
-  `.tgz` or `.tar.bz2`.
 
 Example workflow:
 
