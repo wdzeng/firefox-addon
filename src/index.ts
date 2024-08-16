@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 
 import { handleError } from '@/error'
-import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
+import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
 import {
   requireFileExists,
   requireValidSourceFileExtensionName,

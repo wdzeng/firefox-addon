@@ -6,7 +6,7 @@ import axios from 'axios'
 import tmp from 'tmp'
 
 import { handleError } from '@/error'
-import { generateJwtToken, updateAddon, uploadXpi } from '@/firefox-addon'
+import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
 
 const TEST_ADDON = `
 UEsDBAoAAAAAACY8rlQAAAAAAAAAAAAAAAAQABwAY29udGVudF9zY3JpcHRzL1VUCQADuOp+Ytll
