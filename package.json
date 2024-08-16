@@ -42,6 +42,9 @@
     "overrides": {
       "hasown": "npm:@nolyfill/hasown@^1",
       "is-core-module": "npm:@nolyfill/is-core-module@^1"
+    },
+    "patchedDependencies": {
+      "adm-zip": "patches/adm-zip.patch"
     }
   }
 }

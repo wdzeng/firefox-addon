@@ -33,7 +33,6 @@ function updateVersionAndSaveZip(zipPath: string): void {
   const minute = now.getMinutes()
   const seconds = now.getSeconds()
   const version = `${year.toString().slice(-2)}.${month}${toTwoDigit(date)}.${hour}${toTwoDigit(minute)}.${seconds}`
-  core.debug(`Set version to ${version}`)
 
   // @ts-expect-error: JSON.parse accepts buffer.
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -63,7 +62,16 @@ async function main() {
     const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
     const approvalNotes = 'general update'
     const releaseNotes = { 'zh-TW': 'improve performance' }
-    await updateAddon(addonGuid, license, uuid, jwtToken, approvalNotes, releaseNotes)
+    await updateAddon(
+      addonGuid,
+      license,
+      uuid,
+      jwtToken,
+      approvalNotes,
+      releaseNotes,
+      xpiPath, // Let the source code file be the same as the xpi file in this test.
+      xpiPath
+    )
   } catch (e: unknown) {
     // The test will exit with non-zero code.
     handleError(e)
