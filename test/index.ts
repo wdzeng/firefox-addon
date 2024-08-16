@@ -2,6 +2,7 @@ import fs from 'node:fs'
 
 import * as core from '@actions/core'
 import AdmZip from 'adm-zip'
+import axios from 'axios'
 import tmp from 'tmp'
 
 import { handleError } from '@/error'
@@ -38,6 +39,23 @@ SwECHgMUAAAACACtpCJXncQPnp0AAAAZAQAADQAYAAAAAAABAAAApIE2AwAAbWFuaWZlc3QuanNv
 blVUBQADhSzzZHV4CwABBOgDAAAE6AMAAFBLBQYAAAAABgAGAAICAAAaBAAAAAA=
 `
 
+async function getAddonLastUpdate(addonGuid: string, jwtToken: string): Promise<number> {
+  // https://mozilla.github.io/addons-server/topics/api/addons.html#get--api-v5-addons-addon-(int-id%7Cstring-slug%7Cstring-guid)-
+  const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/`
+  const headers = { Authorization: `jwt ${jwtToken}` }
+  const res = await axios.get<{ last_updated: string }>(url, { headers })
+  const lastUpdate = res.data.last_updated // ISO8601
+  return new Date(lastUpdate).getTime()
+}
+
+function isGitHubAction(): boolean {
+  return Boolean(process.env.GITHUB_ACTIONS)
+}
+
+function isMainGitHubAction(): boolean {
+  return isGitHubAction() && process.env.GITHUB_REF === 'refs/heads/main'
+}
+
 function getEnv(): {
   addonGuid: string
   jwtIssuer: string
@@ -47,7 +65,7 @@ function getEnv(): {
   const jwtIssuer = process.env.TEST_JWT_ISSUER
   const jwtSecret = process.env.TEST_JWT_SECRET
   if (!addonGuid || !jwtIssuer || !jwtSecret) {
-    if (process.env.GITHUB_ACTIONS) {
+    if (isGitHubAction()) {
       core.setFailed(
         'Environment variables TEST_ADDON_GUID, TEST_JWT_ISSUER and TEST_JWT_SECRET are required. Did you set the secrets?'
       )
@@ -61,7 +79,7 @@ function getEnv(): {
   return { addonGuid, jwtIssuer, jwtSecret }
 }
 
-function updateVersionAndSaveZip(zipPath: string): void {
+function updateVersionAndSaveZip(zipPath: string, now: Date): void {
   const zip = new AdmZip(zipPath)
 
   const manifest = zip.getEntry('manifest.json')
@@ -71,7 +89,6 @@ function updateVersionAndSaveZip(zipPath: string): void {
 
   // eslint-disable-next-line unicorn/consistent-function-scoping
   const toTwoDigit = (n: number) => n.toString().padStart(2, '0')
-  const now = new Date()
   const year = now.getFullYear()
   const month = now.getMonth() + 1
   const date = now.getDate()
@@ -92,9 +109,22 @@ function updateVersionAndSaveZip(zipPath: string): void {
 
 async function main() {
   const { addonGuid, jwtIssuer, jwtSecret } = getEnv()
+  const lastUpdate = await getAddonLastUpdate(addonGuid, generateJwtToken(jwtIssuer, jwtSecret))
+  const now = new Date()
+
+  // The firefox add-on server has a rate limit, so don't run this test too frequently. If the last
+  // update is within 1 hour, skip the test. But in production workflow (main branch) we force to
+  // run the test.
+  if (!isMainGitHubAction() && now.getTime() < lastUpdate + 60 * 60 * 1000) {
+    console.warn(
+      `The last update is ${new Date(lastUpdate).toISOString()}. We run the test more than once within an hour, so skip the test.`
+    )
+    process.exit(1)
+  }
+
   const xpiPath = `${tmp.fileSync().name}.zip`
   fs.writeFileSync(xpiPath, TEST_ADDON, 'base64')
-  updateVersionAndSaveZip(xpiPath)
+  updateVersionAndSaveZip(xpiPath, now)
 
   const license = 'MIT'
   const selfHosted = true
