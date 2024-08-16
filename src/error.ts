@@ -49,7 +49,11 @@ export function handleError(error: unknown): never {
   }
 
   // Unknown error. This may be a bug of this action.
-  core.debug(stringify(error))
+  let str_err = stringify(error)
+  if (str_err.length > 256) {
+    str_err = `${str_err.slice(0, 256)} <truncated>`
+  }
+  core.debug(str_err)
   if (error instanceof Error) {
     core.setFailed(`Unknown error occurred: ${error.message}`)
   } else {
