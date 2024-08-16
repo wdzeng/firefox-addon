@@ -3,7 +3,6 @@ import { createReadStream } from 'node:fs'
 import * as core from '@actions/core'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
-import FormData from 'form-data'
 import jwt from 'jsonwebtoken'
 
 import type { UploadResponse } from '@/api-types'
@@ -72,7 +71,10 @@ async function createVersionSource(
   if (license) {
     formData.append('license', license)
   }
-  const headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
+  const headers = {
+    'Authorization': `jwt ${jwtToken}`,
+    'Content-Type': 'multipart/form-data'
+  }
   await axios.post(url, formData, { headers })
 
   core.info('Version source created.')
@@ -94,7 +96,10 @@ async function patchVersionSource(
   if (license) {
     formData.append('license', license)
   }
-  const headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
+  const headers = {
+    'Authorization': `jwt ${jwtToken}`,
+    'Content-Type': 'multipart/form-data'
+  }
   await axios.patch(url, formData, { headers })
 
   core.info('Version source patched.')
@@ -209,7 +214,10 @@ export async function uploadXpi(
   const formData = new FormData()
   formData.append('upload', createReadStream(xpiPath))
   formData.append('channel', selfHosted ? 'unlisted' : 'listed')
-  const headers = { ...formData.getHeaders(), Authorization: `jwt ${jwtToken}` }
+  const headers = {
+    'Authorization': `jwt ${jwtToken}`,
+    'Content-Type': 'multipart/form-data'
+  }
   const response = await axios.post<UploadResponse>(url, formData, { headers })
   core.info('xpi file uploaded.')
 

@@ -26,9 +26,6 @@ importers:
       axios:
         specifier: ^1.7.3
         version: 1.7.3
-      form-data:
-        specifier: ^4.0.0
-        version: 4.0.0
       jsonwebtoken:
         specifier: ^9.0.2
         version: 9.0.2
