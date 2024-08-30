@@ -207,9 +207,6 @@ export async function uploadXpi(
 ): Promise<string> {
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
   const url = 'https://addons.mozilla.org/api/v5/addons/upload/'
-
-  // Send upload request.
-  logger.info('Start to upload xpi file to firefox addons server.')
   const formData = new FormData()
   formData.append('upload', createReadStream(xpiPath))
   formData.append('channel', selfHosted ? 'unlisted' : 'listed')
@@ -219,9 +216,18 @@ export async function uploadXpi(
   }
   const response = await axios.post<UploadResponse>(url, formData, { headers })
   logger.info('xpi file uploaded.')
+  return response.data.uuid
+}
 
-  // Wait until xpi is validated.
-  const uploadUuid = response.data.uuid
+export async function uploadXpi(
+  xpiPath: string,
+  jwtToken: string,
+  selfHosted: boolean
+): Promise<string> {
+  // Send upload request.
+  logger.info('Start to upload xpi file to firefox addons server.')
+
+  const uploadUuid = await createUpload(xpiPath, jwtToken, selfHosted)
   await waitUntilXpiValidated(uploadUuid, jwtToken)
 
   logger.info('xpi processed.')
