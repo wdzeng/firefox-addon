@@ -1,4 +1,5 @@
-import { createReadStream } from 'node:fs'
+import { openAsBlob } from 'node:fs'
+import path from 'node:path'
 
 import AdmZip from 'adm-zip'
 import axios from 'axios'
@@ -66,7 +67,7 @@ async function createVersionSource(
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
   const formData = new FormData()
   formData.append('upload', uploadUuid)
-  formData.append('source', createReadStream(sourceFilePath))
+  formData.append('source', await openAsBlob(sourceFilePath), path.basename(sourceFilePath))
   if (license) {
     formData.append('license', license)
   }
@@ -91,7 +92,7 @@ async function patchVersionSource(
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#version-sources
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/${versionNumber}/`
   const formData = new FormData()
-  formData.append('source', createReadStream(sourceFilePath))
+  formData.append('source', await openAsBlob(sourceFilePath), path.basename(sourceFilePath))
   if (license) {
     formData.append('license', license)
   }
@@ -208,7 +209,7 @@ export async function uploadXpi(
   // https://addons-server.readthedocs.io/en/latest/topics/api/addons.html#upload-create
   const url = 'https://addons.mozilla.org/api/v5/addons/upload/'
   const formData = new FormData()
-  formData.append('upload', createReadStream(xpiPath))
+  formData.append('upload', await openAsBlob(xpiPath), path.basename(xpiPath))
   formData.append('channel', selfHosted ? 'unlisted' : 'listed')
   const headers = {
     'Authorization': `jwt ${jwtToken}`,
