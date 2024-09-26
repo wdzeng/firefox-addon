@@ -24,11 +24,13 @@ Followings items are required before publishing an add-on:
   `{xxxxxxxx-xxxx-xxxx-xxxxxxxxxxxx}`.
 - `jwt-issuer`: (required) your jwt issuer.
 - `jwt-secret`: (required) your jwt secret.
-- `xpi-path`: (required) path to the xpi (zip) file of your add-on generated in the previous
-   workflow steps; must be end with one of `.zip`, `.xpi`, or `.crx`.
+- `xpi-path`: (required) path (or a glob pattern) to the xpi (zip) file of your add-on generated in the previous
+   workflow steps; must end with either `.zip`, `.xpi`, or `.crx`.
 - `approval-notes`: (optional): a secret text to Mozilla reviewers.
 - `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
 - `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
+- `source-file-path` (optional) path (or a glob pattern) to source code archive; must end with
+   either `.zip`, `.tar.gz`, `.tgz` or `.tar.bz2`
 
 Example workflow:
 
