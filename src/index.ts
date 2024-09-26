@@ -1,4 +1,5 @@
 import fs from 'node:fs'
+import { globSync } from 'glob'
 
 import * as core from '@actions/core'
 
@@ -35,15 +36,20 @@ function parseReleaseNotes(): undefined | Record<string, string> {
   return ret
 }
 
-function requireXpiFileExists(xpiPath: string): void {
-  try {
-    const s = fs.statSync(xpiPath)
-    if (!s.isFile()) {
-      throw new FirefoxAddonActionError(`Not a regular file: ${xpiPath}`, ERR_INVALID_INPUT)
-    }
-  } catch {
-    throw new FirefoxAddonActionError(`File not found: ${xpiPath}`, ERR_INVALID_INPUT)
-  }
+function tryResolveFile(pattern: string): string {
+  const foundFiles = globSync(pattern)
+
+  if (foundFiles.length < 1)
+    throw new FirefoxAddonActionError(`File not found: ${pattern}`, ERR_INVALID_INPUT)
+  if (foundFiles.length > 1)
+    throw new FirefoxAddonActionError(`Multiple files found: ${pattern}`, ERR_INVALID_INPUT)
+
+  const stat = fs.statSync(foundFiles[0])
+
+  if (!stat.isFile())
+    throw new FirefoxAddonActionError(`Not a regular file: ${pattern}`, ERR_INVALID_INPUT)
+
+  return foundFiles[0];
 }
 
 function requireValidXpiExtensionName(xpiPath: string) {
@@ -95,9 +101,8 @@ async function run(
 
 async function main() {
   const addonGuid = core.getInput('addon-guid', { required: true })
-  const xpiPath = core.getInput('xpi-path', { required: true })
+  const xpiPath = tryResolveFile(core.getInput('xpi-path', { required: true }))
   requireValidXpiExtensionName(xpiPath)
-  requireXpiFileExists(xpiPath)
 
   const license = core.getInput('license', { required: false }) || undefined
   const releaseNotes = parseReleaseNotes()
@@ -105,9 +110,10 @@ async function main() {
   const selfHosted = core.getBooleanInput('self-hosted')
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
-  const sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
+  let sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
   if (sourceFilePath) {
     requireValidSourceFileExtensionName(sourceFilePath)
+    sourceFilePath = tryResolveFile(sourceFilePath)
   }
 
   try {
