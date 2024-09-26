@@ -3,7 +3,7 @@ import fs from 'node:fs'
 import * as core from '@actions/core'
 import { globSync } from 'glob'
 
-import { ERR_INVALID_INPUT, FirefoxAddonActionError } from './error'
+import { ERR_INVALID_INPUT, FirefoxAddonActionError } from '@/error'
 
 export function stringify(e: unknown): string {
   if (typeof e === 'object') {
