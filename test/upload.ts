@@ -116,8 +116,8 @@ async function main() {
   // update is within 1 hour, skip the test. But in production workflow (main branch) we force to
   // run the test.
   if (!isMainGitHubAction() && now.getTime() < lastUpdate + 60 * 60 * 1000) {
-    console.warn(
-      `The last update is ${new Date(lastUpdate).toISOString()}. We run the test more than once within an hour, so skip the test.`
+    console.error(
+      `The last update is ${new Date(lastUpdate).toISOString()}. We've run the test more than once within an hour, and the Mozilla server may ban us due to too many request. So skip the test.`
     )
     process.exit(1)
   }
