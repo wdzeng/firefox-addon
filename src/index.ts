@@ -3,6 +3,7 @@ import * as core from '@actions/core'
 import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
 import {
+  logger,
   requireValidSourceFileExtensionName,
   requireValidXpiFileExtensionName,
   tryResolveFile,
@@ -20,7 +21,7 @@ async function run(
   releaseNotes: Record<string, string> | undefined,
   sourceFilePath: string | undefined
 ) {
-  core.info('Start to publish add-on.')
+  logger.info('Start to publish add-on.')
   const jwtToken = generateJwtToken(jwtIssuer, jwtSecret)
   const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
   await updateAddon(
@@ -33,7 +34,7 @@ async function run(
     sourceFilePath,
     xpiPath
   )
-  core.info('Add-on published.')
+  logger.info('Add-on published.')
 }
 
 async function main() {

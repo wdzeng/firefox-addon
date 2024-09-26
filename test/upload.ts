@@ -3,14 +3,13 @@
 
 import fs from 'node:fs'
 
-import * as core from '@actions/core'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
 import tmp from 'tmp'
 
 import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
-import { isGitHubAction } from '@/utils'
+import { isGitHubAction, logger } from '@/utils'
 
 const TEST_ADDON = `
 UEsDBAoAAAAAACY8rlQAAAAAAAAAAAAAAAAQABwAY29udGVudF9zY3JpcHRzL1VUCQADuOp+Ytll
@@ -66,7 +65,7 @@ function getEnv(): {
   const jwtSecret = process.env.TEST_JWT_SECRET
   if (!addonGuid || !jwtIssuer || !jwtSecret) {
     if (isGitHubAction()) {
-      core.setFailed(
+      logger.setFailed(
         'Environment variables TEST_ADDON_GUID, TEST_JWT_ISSUER and TEST_JWT_SECRET are required. Did you set the secrets?'
       )
       process.exit(1)
@@ -104,7 +103,7 @@ function updateVersionAndSaveZip(zipPath: string, now: Date): void {
   manifest.setData(JSON.stringify(data))
 
   zip.writeZip()
-  core.info(`Updated version to ${version} at ${zipPath}`)
+  logger.info(`Updated version to ${version} at ${zipPath}`)
 }
 
 async function main() {
