@@ -11,8 +11,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  unittests:
-    name: Run unittests
+  unit-test:
+    name: Run unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,10 +23,10 @@ jobs:
         with:
           version: ^9.7.0
           run_install: true
-      - run: pnpm unittest
+      - run: pnpm test:unit-test
   upload-test:
     name: Run upload test
-    needs: unittests
+    needs: unit-test
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
@@ -46,7 +46,7 @@ jobs:
   publish:
     name: Publish action
     needs:
-      - unittests
+      - unit-test
       - upload-test
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest

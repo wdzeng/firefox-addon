@@ -12,8 +12,8 @@
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
     "transpile": "esbuild src/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/index.cjs",
-    "test": "pnpm unttest && pnpm test:upload",
-    "unittest": "vitest --silent",
+    "test": "pnpm test:unit-test && pnpm test:upload",
+    "test:unit-test": "vitest --silent",
     "test:upload": "pnpm clean && pnpm transpile:test:upload && node -r dotenv/config dist/test/upload.cjs dotenv_config_path=test/.env.local",
     "transpile:test:upload": "esbuild test/upload.ts --platform=node --target=node20 --minify --bundle --outfile=dist/test/upload.cjs",
     "lint": "eslint src --fix",
