@@ -3,9 +3,9 @@ import * as core from '@actions/core'
 import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
 import {
-  requireFileExists,
   requireValidSourceFileExtensionName,
   requireValidXpiFileExtensionName,
+  tryResolveFile,
   validateAndParseReleaseNotesInput
 } from '@/utils'
 
@@ -40,21 +40,22 @@ async function main() {
   const addonGuid = core.getInput('addon-guid', { required: true })
   const jwtIssuer = core.getInput('jwt-issuer', { required: true })
   const jwtSecret = core.getInput('jwt-secret', { required: true })
-  const xpiPath = core.getInput('xpi-path', { required: true })
+  let xpiPath = core.getInput('xpi-path', { required: true })
   const approvalNotes = core.getInput('approval-notes', { required: false }) || undefined
   const license = core.getInput('license', { required: false }) || undefined
   const releaseNotesInput = core.getInput('release-notes', { required: false }) || undefined
   const selfHosted = core.getBooleanInput('self-hosted')
-  const sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
+  let sourceFilePath = core.getInput('source-file-path', { required: false }) || undefined
 
   try {
+    xpiPath = tryResolveFile(xpiPath)
+    requireValidXpiFileExtensionName(xpiPath)
+
     const releaseNotes = validateAndParseReleaseNotesInput(releaseNotesInput)
     if (sourceFilePath) {
+      sourceFilePath = tryResolveFile(sourceFilePath)
       requireValidSourceFileExtensionName(sourceFilePath)
-      requireFileExists(sourceFilePath)
     }
-    requireValidXpiFileExtensionName(xpiPath)
-    requireFileExists(xpiPath)
 
     await run(
       addonGuid,

@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 
 import * as core from '@actions/core'
+import { globSync } from 'glob'
 
 import { ERR_INVALID_INPUT, FirefoxAddonActionError } from './error'
 
@@ -26,15 +27,23 @@ function isStringToStringMapping(a: unknown): a is Record<string, string> {
   return true
 }
 
-export function requireFileExists(path: string): void {
-  try {
-    const s = fs.statSync(path)
-    if (!s.isFile()) {
-      throw new FirefoxAddonActionError(`Not a regular file: ${path}`, ERR_INVALID_INPUT)
-    }
-  } catch {
-    throw new FirefoxAddonActionError(`File not found: ${path}`, ERR_INVALID_INPUT)
+export function tryResolveFile(pattern: string): string {
+  const foundFiles = globSync(pattern)
+
+  if (foundFiles.length < 1) {
+    throw new FirefoxAddonActionError(`File not found: ${pattern}`, ERR_INVALID_INPUT)
   }
+  if (foundFiles.length > 1) {
+    throw new FirefoxAddonActionError(`Multiple files found: ${pattern}`, ERR_INVALID_INPUT)
+  }
+
+  const stat = fs.statSync(foundFiles[0])
+
+  if (!stat.isFile()) {
+    throw new FirefoxAddonActionError(`Not a regular file: ${pattern}`, ERR_INVALID_INPUT)
+  }
+
+  return foundFiles[0]
 }
 
 export function validateAndParseReleaseNotesInput(
