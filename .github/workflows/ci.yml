@@ -23,14 +23,31 @@ jobs:
         with:
           version: ^9.7.0
           run_install: true
+      - run: pnpm unittest
+  upload-test:
+    name: Run upload test
+    needs: unittests
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - uses: pnpm/action-setup@v3
+        with:
+          version: ^9.7.0
+          run_install: true
       - env:
           TEST_ADDON_GUID: ${{ secrets.TEST_ADDON_GUID }}
           TEST_JWT_ISSUER: ${{ secrets.TEST_JWT_ISSUER }}
           TEST_JWT_SECRET: ${{ secrets.TEST_JWT_SECRET }}
-        run: pnpm test
+        run: pnpm test:upload
   publish:
     name: Publish action
-    needs: unittests
+    needs:
+      - unittests
+      - upload-test
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
