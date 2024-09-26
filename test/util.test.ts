@@ -1,11 +1,15 @@
-import { expect, test } from 'vitest'
+import fs from 'node:fs'
+import path from 'node:path'
+
+import tmp from 'tmp'
+import { describe, expect, test } from 'vitest'
 
 import { ERR_INVALID_INPUT, FirefoxAddonActionError } from '@/error'
 import {
-  requireFileExists,
   requireValidSourceFileExtensionName,
   requireValidXpiFileExtensionName,
   stringify,
+  tryResolveFile,
   validateAndParseReleaseNotesInput
 } from '@/utils'
 
@@ -18,25 +22,68 @@ test('stringify', () => {
   expect(stringify(undefined)).toBe('undefined')
 })
 
-test('requireFileExists', () => {
-  const thisFile = new URL(import.meta.url).pathname
-  expect(() => requireFileExists(thisFile)).not.toThrow()
+describe('tryResolveFile', () => {
+  test('happy path', () => {
+    const tmpDir = tmp.dirSync({ keep: false, unsafeCleanup: true })
+    fs.writeFileSync(path.join(tmpDir.name, 'foo.txt'), '')
+    process.chdir(tmpDir.name)
+    expect(tryResolveFile('foo.txt')).toBe('foo.txt')
+  })
 
-  try {
-    requireFileExists('/tmp/non-existent')
-    expect.unreachable()
-  } catch (e) {
-    expect(e).toBeInstanceOf(FirefoxAddonActionError)
-    expect(e).toHaveProperty('code', ERR_INVALID_INPUT)
-  }
+  test('happy path (glob)', () => {
+    const tmpDir = tmp.dirSync({ keep: false, unsafeCleanup: true })
+    fs.writeFileSync(path.join(tmpDir.name, 'foo.txt'), '')
+    process.chdir(tmpDir.name)
+    expect(tryResolveFile('*.txt')).toBe('foo.txt')
+  })
 
-  try {
-    requireFileExists('/tmp')
-    expect.unreachable()
-  } catch (e) {
-    expect(e).toBeInstanceOf(FirefoxAddonActionError)
-    expect(e).toHaveProperty('code', ERR_INVALID_INPUT)
-  }
+  test('no file found', () => {
+    /*
+     * File system hierarchy:
+     *
+     * /tmp (working directory here)
+     * └── foo/
+     *     └── bar.txt
+     *
+     * We want to make sure when the working directory is /tmp, globbing ("bar.txt") should not find
+     * the file (because its in a subdirectory).
+     */
+    try {
+      const tmpDir = tmp.dirSync({ keep: false, unsafeCleanup: true })
+      fs.mkdirSync(path.join(tmpDir.name, 'foo'))
+      fs.writeFileSync(path.join(tmpDir.name, 'foo', 'bar.txt'), '')
+      process.chdir(tmpDir.name)
+      tryResolveFile('bar.txt')
+      expect.unreachable()
+    } catch (e) {
+      expect(e).toBeInstanceOf(FirefoxAddonActionError)
+      expect(e).toHaveProperty('code', ERR_INVALID_INPUT)
+    }
+  })
+
+  test('multiple files found', () => {
+    try {
+      const tmpDir = tmp.dirSync({ keep: false, unsafeCleanup: true })
+      fs.writeFileSync(path.join(tmpDir.name, 'foo.txt'), '')
+      fs.writeFileSync(path.join(tmpDir.name, 'bar.txt'), '')
+      process.chdir(tmpDir.name)
+      tryResolveFile('*.txt')
+      expect.unreachable()
+    } catch (e) {
+      expect(e).toBeInstanceOf(FirefoxAddonActionError)
+      expect(e).toHaveProperty('code', ERR_INVALID_INPUT)
+    }
+  })
+
+  test('directory', () => {
+    try {
+      tryResolveFile('/tmp')
+      expect.unreachable()
+    } catch (e) {
+      expect(e).toBeInstanceOf(FirefoxAddonActionError)
+      expect(e).toHaveProperty('code', ERR_INVALID_INPUT)
+    }
+  })
 })
 
 test('validateAndParseReleaseNotesInput', () => {
