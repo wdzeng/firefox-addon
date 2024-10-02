@@ -86,7 +86,7 @@ describe('uploadXpi', () => {
         expect(hasUpload).toBe(true)
         expect(hasValidated).toBe(false)
 
-        // TODO: better approach: return noy yet validated before 9 minutes; this allows use to also
+        // TODO: better approach: return not yet validated before 9 minutes; this allows us to also
         // check the timeout settings. But I don't know how to accomplish this using vitest.
         hasValidated = true
         return [
