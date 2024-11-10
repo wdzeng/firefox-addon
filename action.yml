@@ -22,6 +22,9 @@ inputs:
   jwt-secret:
     description: Firefox Addons JWT secret.
     required: true
+  approval-notes:
+    description: A secret text to Mozilla reviewers.
+    required: false
 
 runs:
   using: node20
