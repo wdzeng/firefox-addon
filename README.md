@@ -28,7 +28,6 @@ Followings items are required before publishing an add-on:
    the previous workflow steps; must end with either `.zip`, `.xpi`, or `.crx`; if glob pattern then
    it must match exactly one file.
 - `approval-notes`: (optional): a secret text to Mozilla reviewers.
-- `license`: (optional) add-on's [license slug](https://addons-server.readthedocs.io/en/latest/topics/api/licenses.html#license-choices-non-themes).
 - `self-hosted` (optional) whether the add-on should be self-hosted; default `false`.
 - `source-file-path` (optional) path (or a glob pattern) to source code archive; must end with
    either `.zip`, `.tar.gz`, `.tgz` or `.tar.bz2`; if glob pattern then it must match exactly one
