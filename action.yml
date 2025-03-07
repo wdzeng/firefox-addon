@@ -25,6 +25,8 @@ inputs:
   approval-notes:
     description: A secret text to Mozilla reviewers.
     required: false
+  license:
+    description: Addon's license slug.
 
 runs:
   using: node20
