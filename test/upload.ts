@@ -94,7 +94,14 @@ function updateVersionAndSaveZip(zipPath: string, now: Date): void {
   const hour = now.getHours()
   const minute = now.getMinutes()
   const seconds = now.getSeconds()
-  const version = `${year.toString().slice(-2)}.${month}${toTwoDigit(date)}.${hour}${toTwoDigit(minute)}.${seconds}`
+  const version = [
+    year.toString().slice(-2),
+    `${month}${toTwoDigit(date)}`,
+    `${hour}${toTwoDigit(minute)}`,
+    `${seconds}`
+  ]
+    .map(s => Number.parseInt(s))
+    .join('.')
 
   // @ts-expect-error: JSON.parse accepts buffer.
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
