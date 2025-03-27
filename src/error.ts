@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios'
 import { CustomError } from 'ts-custom-error'
 
-import { logger, stringify } from '@/utils'
+import { logger, stringifyForDebugging } from '@/utils'
 
 export const ERR_XPI_VALIDATION_FAILED = 2
 export const ERR_XPI_VALIDATION_TIMEOUT = 4
@@ -20,11 +20,11 @@ export class FirefoxAddonActionError extends CustomError {
 }
 
 export function convertErrorToString(e: unknown): string {
-  return e instanceof Error ? e.message : stringify(e)
+  return e instanceof Error ? e.message : stringifyForDebugging(e)
 }
 
 function getStringOrError(e: unknown): string | Error {
-  return e instanceof Error ? e : stringify(e)
+  return e instanceof Error ? e : stringifyForDebugging(e)
 }
 
 export function handleError(error: unknown): never {
@@ -47,7 +47,7 @@ export function handleError(error: unknown): never {
   }
 
   // Unknown error. This may be a bug of this action.
-  let str_err = stringify(error)
+  let str_err = stringifyForDebugging(error)
   if (str_err.length > 256) {
     str_err = `${str_err.slice(0, 256)} <truncated>`
   }

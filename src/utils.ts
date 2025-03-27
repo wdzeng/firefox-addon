@@ -5,17 +5,18 @@ import { globSync } from 'glob'
 
 import { ERR_INVALID_INPUT, FirefoxAddonActionError } from '@/error'
 
-export function stringify(e: unknown): string {
+export function stringifyForDebugging(e: unknown): string {
   if (typeof e === 'object') {
     return JSON.stringify(e)
   }
   if (typeof e === 'string') {
-    return e
+    return e.trim() ? e : '<empty string>'
   }
 
   // Since e is not object, we can safely call String(e).
   // eslint-disable-next-line @typescript-eslint/no-base-to-string
-  return String(e)
+  const ret = String(e)
+  return ret.trim() ? ret : '<empty string>'
 }
 
 function isStringToStringMapping(a: unknown): a is Record<string, string> {

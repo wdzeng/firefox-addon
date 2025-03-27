@@ -13,7 +13,7 @@ import {
   FirefoxAddonActionError,
   convertErrorToString
 } from '@/error'
-import { logger, stringify } from '@/utils'
+import { logger, stringifyForDebugging } from '@/utils'
 
 import type { UploadResponse } from '@/api-types'
 
@@ -192,7 +192,7 @@ async function waitUntilXpiValidated(uploadUuid: string, jwtToken: string): Prom
         return
       }
 
-      const validationMsg = stringify(response.data.validation)
+      const validationMsg = stringifyForDebugging(response.data.validation)
       throw new FirefoxAddonActionError(validationMsg, ERR_XPI_VALIDATION_FAILED)
     }
   }
