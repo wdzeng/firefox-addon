@@ -9,6 +9,9 @@
     "url": "git+https://github.com/wdzeng/firefox-addon.git"
   },
   "license": "MIT",
+  "files": [
+    "src/**/*.ts"
+  ],
   "scripts": {
     "build": "pnpm clean && pnpm transpile && cp action.yml dist",
     "transpile": "esbuild src/index.ts --platform=node --target=node20 --minify --bundle --outfile=dist/index.cjs",
@@ -16,7 +19,7 @@
     "test:unit-test": "vitest --silent",
     "test:upload": "pnpm clean && pnpm transpile:test:upload && node -r dotenv/config dist/test/upload.cjs dotenv_config_path=test/.env.local",
     "transpile:test:upload": "esbuild test/upload.ts --platform=node --target=node20 --minify --bundle --outfile=dist/test/upload.cjs",
-    "lint": "eslint src --fix",
+    "lint": "eslint --fix",
     "clean": "rm -rf dist"
   },
   "dependencies": {
@@ -48,5 +51,8 @@
       "isarray": "npm:@nolyfill/isarray@^1",
       "safe-buffer": "npm:@nolyfill/safe-buffer@^1"
     }
+  },
+  "engines": {
+    "node": "^20.18.2"
   }
 }
