@@ -15,7 +15,7 @@ import {
 } from '@/error'
 import { logger, stringifyForDebugging } from '@/utils'
 
-import type { UploadResponse } from '@/api-types'
+import type { Compatibility, UploadResponse } from '@/api-types'
 
 export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   // https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#create-a-jwt-for-each-request
@@ -36,6 +36,7 @@ async function createVersion(
   addonGuid: string,
   jwtToken: string,
   approvalNotes: string | undefined,
+  compatibility: Compatibility | undefined,
   license: string | undefined,
   releaseNotes: Record<string, string> | undefined,
   uploadUuid: string
@@ -46,6 +47,7 @@ async function createVersion(
   const url = `https://addons.mozilla.org/api/v5/addons/addon/${addonGuid}/versions/`
   const body = {
     approval_notes: approvalNotes,
+    compatibility,
     license,
     release_notes: releaseNotes,
     upload: uploadUuid
@@ -155,20 +157,41 @@ export async function updateAddon(
   uploadUuid: string,
   jwtToken: string,
   approvalNotes: string | undefined,
+  compatibility: Compatibility | undefined,
   releaseNotes: Record<string, string> | undefined,
   sourceFilePath: string | undefined,
   xpiPath: string
 ) {
   if (sourceFilePath) {
-    if (approvalNotes !== undefined || releaseNotes !== undefined) {
+    if (approvalNotes !== undefined || releaseNotes !== undefined || compatibility !== undefined) {
+      // Version source files cannot be uploaded as JSON; the request must be sent as multipart
+      // form-data instead. If desired, license can be set set/updated at the same time as source,
+      // but fields that contain complex data structure (list or object) such as compatibility or
+      // release_notes cannot, so separate API calls are needed.
       const versionNumber = getAddonVersionNumber(xpiPath)
-      await createVersion(addonGuid, jwtToken, approvalNotes, license, releaseNotes, uploadUuid)
+      await createVersion(
+        addonGuid,
+        jwtToken,
+        approvalNotes,
+        compatibility,
+        license,
+        releaseNotes,
+        uploadUuid
+      )
       await patchVersionSource(addonGuid, versionNumber, jwtToken, license, sourceFilePath)
     } else {
       await createVersionSource(addonGuid, jwtToken, license, sourceFilePath, uploadUuid)
     }
   } else {
-    await createVersion(addonGuid, jwtToken, approvalNotes, license, releaseNotes, uploadUuid)
+    await createVersion(
+      addonGuid,
+      jwtToken,
+      approvalNotes,
+      compatibility,
+      license,
+      releaseNotes,
+      uploadUuid
+    )
   }
 }
 

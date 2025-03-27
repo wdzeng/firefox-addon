@@ -5,6 +5,8 @@ import { globSync } from 'glob'
 
 import { ERR_INVALID_INPUT, FirefoxAddonActionError } from '@/error'
 
+import type { Compatibility } from '@/api-types'
+
 export function stringifyForDebugging(e: unknown): string {
   if (typeof e === 'object') {
     return JSON.stringify(e)
@@ -95,6 +97,77 @@ export function requireValidSourceFileExtensionName(path: string) {
       ERR_INVALID_INPUT
     )
   }
+}
+
+export function validateAndParseCompatibilityInput(
+  compatibility: string | undefined
+): Compatibility | undefined {
+  if (!compatibility) {
+    return undefined
+  }
+
+  // Check if this is a JSON object.
+  if (compatibility.startsWith('{')) {
+    // Compatibility is a JSON object.
+
+    let ret
+
+    try {
+      ret = JSON.parse(compatibility) as object
+    } catch {
+      throw new FirefoxAddonActionError(
+        `Input "compatibility" is not a valid JSON string: ${compatibility}`,
+        ERR_INVALID_INPUT
+      )
+    }
+
+    for (const v of Object.values(ret)) {
+      if (v === null || !(v instanceof Object)) {
+        throw new FirefoxAddonActionError(
+          `Unexpected non-object value in compatibility field: ${stringifyForDebugging(v)}`,
+          ERR_INVALID_INPUT
+        )
+      }
+      const keys = Object.keys(v as object)
+      const invalidKey = keys.find(k => k !== 'max' && k !== 'min')
+      if (invalidKey) {
+        throw new FirefoxAddonActionError(
+          `Unexpected keys in compatibility field: ${invalidKey}; expected "min" and/or "max"`,
+          ERR_INVALID_INPUT
+        )
+      }
+
+      const values = Object.values(v as object) as unknown[]
+      const invalidValue = values.find(w => typeof w !== 'string' || !w)
+      if (invalidValue) {
+        throw new FirefoxAddonActionError(
+          `Unexpected values in compatibility field: ${stringifyForDebugging(invalidValue)}; expected non-empty string`,
+          ERR_INVALID_INPUT
+        )
+      }
+    }
+
+    core.debug('Parse compatibility as an object.')
+    return ret as Compatibility
+  }
+
+  // Compatibility is a comma-separated list of keys.
+  const ret = compatibility.split(',').map(v => v.trim())
+  if (ret.includes('')) {
+    throw new FirefoxAddonActionError(
+      `Invalid compatibility field: empty string found in keys: ${compatibility}`,
+      ERR_INVALID_INPUT
+    )
+  }
+  if (new Set(ret).size !== ret.length) {
+    throw new FirefoxAddonActionError(
+      `Found duplicate keys in compatibility field: ${compatibility}`,
+      ERR_INVALID_INPUT
+    )
+  }
+
+  core.debug('Parse compatibility as a comma-delimited array.')
+  return ret as Compatibility
 }
 
 export function isGitHubAction(): boolean {

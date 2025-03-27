@@ -11,6 +11,8 @@ import { handleError } from '@/error'
 import { generateJwtToken, updateAddon, uploadXpi } from '@/lib'
 import { isGitHubAction, logger } from '@/utils'
 
+import type { Compatibility } from '@/api-types'
+
 const TEST_ADDON = `
 UEsDBAoAAAAAACY8rlQAAAAAAAAAAAAAAAAQABwAY29udGVudF9zY3JpcHRzL1VUCQADuOp+Ytll
 umZ1eAsAAQToAwAABOgDAABQSwMECgAAAAAAbqQiV0AJ1NIbAAAAGwAAABsAHABjb250ZW50X3Nj
@@ -139,6 +141,16 @@ async function main() {
     const jwtToken = generateJwtToken(jwtIssuer, jwtSecret)
     const uuid = await uploadXpi(xpiPath, jwtToken, selfHosted)
     const approvalNotes = 'general update'
+    const compatibility = {
+      android: {
+        min: '58.0a1',
+        max: '73.0'
+      },
+      firefox: {
+        min: '58.0a1',
+        max: '73.0'
+      }
+    } satisfies Compatibility
     const releaseNotes = { 'zh-TW': 'improve performance' }
     await updateAddon(
       addonGuid,
@@ -146,6 +158,7 @@ async function main() {
       uuid,
       jwtToken,
       approvalNotes,
+      compatibility,
       releaseNotes,
       xpiPath, // Let the source code file be the same as the xpi file in this test.
       xpiPath

@@ -33,6 +33,9 @@ Followings items are required before publishing an add-on:
 - `source-file-path` (optional) path (or a glob pattern) to source code archive; must end with
    either `.zip`, `.tar.gz`, `.tgz` or `.tar.bz2`; if glob pattern then it must match exactly one
    file.
+- `compatibility`: (optional) addon's compatibility; this could be a comma-separated list (e.g.
+  `firefox,android`) as an array, or a JSON-serialized string (e.g.
+  `{"firefox":{"min":"58.0a1","max":"133.0"}}`) as an object.
 
 Example workflow:
 

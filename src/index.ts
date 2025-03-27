@@ -7,8 +7,11 @@ import {
   requireValidSourceFileExtensionName,
   requireValidXpiFileExtensionName,
   tryResolveFile,
+  validateAndParseCompatibilityInput,
   validateAndParseReleaseNotesInput
 } from '@/utils'
+
+import type { Compatibility } from '@/api-types'
 
 async function run(
   addonGuid: string,
@@ -18,6 +21,7 @@ async function run(
   jwtIssuer: string,
   jwtSecret: string,
   approvalNotes: string | undefined,
+  compatibility: Compatibility | undefined,
   releaseNotes: Record<string, string> | undefined,
   sourceFilePath: string | undefined
 ) {
@@ -30,6 +34,7 @@ async function run(
     uuid,
     jwtToken,
     approvalNotes,
+    compatibility,
     releaseNotes,
     sourceFilePath,
     xpiPath
@@ -43,6 +48,7 @@ async function main() {
   const jwtSecret = core.getInput('jwt-secret', { required: true })
   let xpiPath = core.getInput('xpi-path', { required: true })
   const approvalNotes = core.getInput('approval-notes', { required: false }) || undefined
+  const compatibilityInput = core.getInput('compatibility', { required: false }) || undefined
   const license = core.getInput('license', { required: false }) || undefined
   const releaseNotesInput = core.getInput('release-notes', { required: false }) || undefined
   const selfHosted = core.getBooleanInput('self-hosted')
@@ -58,6 +64,8 @@ async function main() {
       requireValidSourceFileExtensionName(sourceFilePath)
     }
 
+    const compatibility = validateAndParseCompatibilityInput(compatibilityInput)
+
     await run(
       addonGuid,
       license,
@@ -66,6 +74,7 @@ async function main() {
       jwtIssuer,
       jwtSecret,
       approvalNotes,
+      compatibility,
       releaseNotes,
       sourceFilePath
     )

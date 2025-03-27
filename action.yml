@@ -28,6 +28,9 @@ inputs:
   license:
     description: Addon's license slug.
     required: false
+  compatibility:
+    description: Addon's compatibility.
+    required: false
 
 runs:
   using: node20

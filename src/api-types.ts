@@ -17,3 +17,6 @@ export interface UploadResponse {
   // The version number parsed from the manifest.
   version: string
 }
+
+// https://mozilla.github.io/addons-server/topics/api/addons.html#version-compatibility-examples
+export type Compatibility = string[] | Record<string, { min?: string; max?: string }>
