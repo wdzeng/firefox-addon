@@ -3,9 +3,9 @@ import path from 'node:path'
 
 import AdmZip from 'adm-zip'
 import axios from 'axios'
+import { FormData } from 'formdata-node'
 import jwt from 'jsonwebtoken'
 
-import type { UploadResponse } from '@/api-types'
 import {
   ERR_VERSION_NUMBER,
   ERR_XPI_VALIDATION_FAILED,
@@ -14,6 +14,8 @@ import {
   convertErrorToString
 } from '@/error'
 import { logger, stringify } from '@/utils'
+
+import type { UploadResponse } from '@/api-types'
 
 export function generateJwtToken(jwtIssuer: string, jwtSecret: string): string {
   // https://addons-server.readthedocs.io/en/latest/topics/api/auth.html#create-a-jwt-for-each-request

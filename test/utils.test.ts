@@ -27,6 +27,7 @@ describe('tryResolveFile', () => {
     const tmpDir = tmp.dirSync({ keep: false, unsafeCleanup: true })
     fs.writeFileSync(path.join(tmpDir.name, 'foo.txt'), '')
     process.chdir(tmpDir.name)
+
     expect(tryResolveFile('foo.txt')).toBe('foo.txt')
   })
 
@@ -34,6 +35,7 @@ describe('tryResolveFile', () => {
     const tmpDir = tmp.dirSync({ keep: false, unsafeCleanup: true })
     fs.writeFileSync(path.join(tmpDir.name, 'foo.txt'), '')
     process.chdir(tmpDir.name)
+
     expect(tryResolveFile('*.txt')).toBe('foo.txt')
   })
 
@@ -54,6 +56,7 @@ describe('tryResolveFile', () => {
       fs.writeFileSync(path.join(tmpDir.name, 'foo', 'bar.txt'), '')
       process.chdir(tmpDir.name)
       tryResolveFile('bar.txt')
+
       expect.unreachable()
     } catch (e) {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)
@@ -68,6 +71,7 @@ describe('tryResolveFile', () => {
       fs.writeFileSync(path.join(tmpDir.name, 'bar.txt'), '')
       process.chdir(tmpDir.name)
       tryResolveFile('*.txt')
+
       expect.unreachable()
     } catch (e) {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)
@@ -78,6 +82,7 @@ describe('tryResolveFile', () => {
   test('directory', () => {
     try {
       tryResolveFile('/tmp')
+
       expect.unreachable()
     } catch (e) {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)
@@ -87,7 +92,7 @@ describe('tryResolveFile', () => {
 })
 
 test('validateAndParseReleaseNotesInput', () => {
-  expect(validateAndParseReleaseNotesInput('{"foo": "bar"}')).toEqual({ foo: 'bar' })
+  expect(validateAndParseReleaseNotesInput('{"foo": "bar"}')).toStrictEqual({ foo: 'bar' })
   expect(validateAndParseReleaseNotesInput('')).toBeUndefined()
   expect(validateAndParseReleaseNotesInput('{}')).toBeUndefined()
 
@@ -105,6 +110,7 @@ test('validateAndParseReleaseNotesInput', () => {
   for (const input of errorCases) {
     try {
       validateAndParseReleaseNotesInput(input)
+
       expect.unreachable()
     } catch (e) {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)
@@ -122,6 +128,7 @@ test('requireValidXpiFileExtensionName', () => {
   for (const input of errorCases) {
     try {
       requireValidXpiFileExtensionName(input)
+
       expect.unreachable()
     } catch (e) {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)
@@ -140,6 +147,7 @@ test('requireValidSourceFileExtensionName', () => {
   for (const input of errorCases) {
     try {
       requireValidSourceFileExtensionName(input)
+
       expect.unreachable()
     } catch (e) {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)

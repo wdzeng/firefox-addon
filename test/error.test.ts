@@ -35,13 +35,13 @@ test('handleError', () => {
 
   expect(() => {
     handleError(new FirefoxAddonActionError('message', 42))
-  }).toThrowError(new ProcessExitError(42))
+  }).toThrow(new ProcessExitError(42))
   expect(() => {
     handleError(new AxiosError('hello'))
-  }).toThrowError(new ProcessExitError(ERR_UNKNOWN_HTTP))
+  }).toThrow(new ProcessExitError(ERR_UNKNOWN_HTTP))
   expect(() => {
     handleError(new Error('hello'))
-  }).toThrowError(new ProcessExitError(ERR_UNKNOWN))
+  }).toThrow(new ProcessExitError(ERR_UNKNOWN))
 
   spy.mockRestore()
 })

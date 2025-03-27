@@ -2,13 +2,17 @@ import fs from 'node:fs'
 
 import axios from 'axios'
 import AxiosMockAdapter from 'axios-mock-adapter'
+import { File } from 'formdata-node'
 import jwt from 'jsonwebtoken'
 import tmp from 'tmp'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import type { UploadResponse } from '@/api-types'
 import { ERR_XPI_VALIDATION_TIMEOUT, FirefoxAddonActionError } from '@/error'
 import { generateJwtToken, uploadXpi } from '@/lib'
+
+import type { FormData } from 'formdata-node'
+
+import type { UploadResponse } from '@/api-types'
 
 test('generateJwtToken', () => {
   vi.useFakeTimers()
@@ -18,10 +22,11 @@ test('generateJwtToken', () => {
   const jwtSecret = 'test-jwt-secret'
   const token = generateJwtToken(jwtIssuer, jwtSecret)
   const decoded = jwt.verify(token, jwtSecret, { issuer: jwtIssuer }) as jwt.JwtPayload
+
   expect(decoded.iat).toBe(42)
   expect(decoded.exp).toBe(342)
   expect(decoded.iss).toBe('test-jwt-issuer')
-  expect(decoded.jti).toBeTruthy()
+  expect(decoded.jti).toBeDefined()
 
   vi.useRealTimers()
 })
@@ -45,6 +50,7 @@ describe('uploadXpi', () => {
 
     mockAdapter
       .onPost('https://addons.mozilla.org/api/v5/addons/upload/', undefined, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({
           'Authorization': 'jwt test-jwt-token',
           'Content-Type': 'multipart/form-data'
@@ -53,12 +59,15 @@ describe('uploadXpi', () => {
       .replyOnce(async config => {
         expect(hasUpload).toBe(false)
 
-        const formData: FormData = config.data
+        const formData = config.data as FormData
+
         expect(formData.getAll('upload')).toHaveLength(1)
         expect(formData.get('upload')).toBeInstanceOf(File)
+
         const upload = formData.get('upload') as File
+
         await expect(upload.text()).resolves.toBe('test-xpi-content')
-        expect(formData.getAll('channel')).toEqual(['unlisted'])
+        expect(formData.getAll('channel')).toStrictEqual(['unlisted'])
 
         hasUpload = true
         return [
@@ -78,6 +87,7 @@ describe('uploadXpi', () => {
 
     mockAdapter
       .onGet('https://addons.mozilla.org/api/v5/addons/upload/test-upload-uuid/', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({
           Authorization: 'jwt test-jwt-token'
         })
@@ -110,6 +120,7 @@ describe('uploadXpi', () => {
     const uploadUuidPromise = uploadXpi(xpiPath, 'test-jwt-token', true)
     await vi.waitUntil(() => hasUpload)
     vi.advanceTimersByTime(15 * 1000)
+
     await expect(uploadUuidPromise).resolves.toBe('test-upload-uuid')
     expect(hasUpload).toBe(true)
     expect(hasValidated).toBe(true)
@@ -118,6 +129,7 @@ describe('uploadXpi', () => {
   test('fail to create upload', async () => {
     mockAdapter
       .onPost('https://addons.mozilla.org/api/v5/addons/upload/', undefined, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({
           'Authorization': 'jwt test-jwt-token',
           'Content-Type': 'multipart/form-data'
@@ -128,6 +140,7 @@ describe('uploadXpi', () => {
     const xpiPath = `${tmp.tmpNameSync()}.xpi`
     fs.writeFileSync(xpiPath, 'test-xpi-content')
     const uploadUuidPromise = uploadXpi(xpiPath, 'test-jwt-token', true)
+
     await expect(uploadUuidPromise).rejects.toThrow()
   })
 
@@ -136,6 +149,7 @@ describe('uploadXpi', () => {
 
     mockAdapter
       .onPost('https://addons.mozilla.org/api/v5/addons/upload/', undefined, {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({
           'Authorization': 'jwt test-jwt-token',
           'Content-Type': 'multipart/form-data'
@@ -144,12 +158,15 @@ describe('uploadXpi', () => {
       .replyOnce(async config => {
         expect(hasUpload).toBe(false)
 
-        const formData: FormData = config.data
+        const formData = config.data as FormData
+
         expect(formData.getAll('upload')).toHaveLength(1)
         expect(formData.get('upload')).toBeInstanceOf(File)
+
         const upload = formData.get('upload') as File
+
         await expect(upload.text()).resolves.toBe('test-xpi-content')
-        expect(formData.getAll('channel')).toEqual(['unlisted'])
+        expect(formData.getAll('channel')).toStrictEqual(['unlisted'])
 
         hasUpload = true
         return [
@@ -169,12 +186,14 @@ describe('uploadXpi', () => {
 
     mockAdapter
       .onGet('https://addons.mozilla.org/api/v5/addons/upload/test-upload-uuid/', {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         headers: expect.objectContaining({
           Authorization: 'jwt test-jwt-token'
         })
       })
       .reply(_ => {
         expect(hasUpload).toBe(true)
+
         return [
           200,
           {
@@ -202,6 +221,7 @@ describe('uploadXpi', () => {
       expect(e).toBeInstanceOf(FirefoxAddonActionError)
       expect(e).toHaveProperty('code', ERR_XPI_VALIDATION_TIMEOUT)
     }
+
     expect(hasUpload).toBe(true)
   })
 })

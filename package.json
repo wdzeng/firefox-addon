@@ -40,6 +40,7 @@
     "esbuild": "^0.25.1",
     "eslint": "^9.23.0",
     "eslint-config-wdzeng": "github:wdzeng/eslint-config#semver:~0.14.3",
+    "formdata-node": "^6.0.3",
     "prettier": "^3.5.3",
     "tmp": "^0.2.3",
     "typescript": "^5.8.2",

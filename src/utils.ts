@@ -12,6 +12,9 @@ export function stringify(e: unknown): string {
   if (typeof e === 'string') {
     return e
   }
+
+  // Since e is not object, we can safely call String(e).
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
   return String(e)
 }
 
@@ -37,13 +40,13 @@ export function tryResolveFile(pattern: string): string {
     throw new FirefoxAddonActionError(`Multiple files found: ${pattern}`, ERR_INVALID_INPUT)
   }
 
-  const stat = fs.statSync(foundFiles[0])
+  const stat = fs.statSync(foundFiles[0]!)
 
   if (!stat.isFile()) {
     throw new FirefoxAddonActionError(`Not a regular file: ${pattern}`, ERR_INVALID_INPUT)
   }
 
-  return foundFiles[0]
+  return foundFiles[0]!
 }
 
 export function validateAndParseReleaseNotesInput(
